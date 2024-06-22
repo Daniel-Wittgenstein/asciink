@@ -257,19 +257,17 @@
       doRunStory()
     }
 
-    async function doRunStory() {
+    function doRunStory() {
       while (story.canContinue) {
         const content = story.Continue()
         console.log("text print", content)
         print(content, "text")
-        await sleep(delay)
       }
       if (story.currentChoices.length > 0) {
         for (let i = 0; i < story.currentChoices.length; i++) {
           const choice = story.currentChoices[i]
           console.log("choice print", choice.text)
           print((i + 1) + ". " + choice.text, "choice")
-          await sleep(delay)
         }
       }
     }
@@ -467,10 +465,6 @@
 
     function print(text, cssClass) {
       outputDiv.innerHTML += `<div class="${cssClass}">${text}</div>`
-    }
-
-    function sleep(time) {
-      return new Promise(n => setTimeout(n, time))
     }
 
 
