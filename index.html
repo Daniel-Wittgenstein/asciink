@@ -6,6 +6,9 @@
     <style>
       :root {
         --bar-height: 32px;
+        --bg: #222;
+        --choice-color: yellow;
+        --text-color: purple; 
       }
 
       body {
@@ -58,12 +61,13 @@
       }
 
       .text {
-        background: #222;
+        background: var(--bg);
+        color: var(--text-color);
       }
 
       .choice {
-        background: #222;
-        color: #0f0;
+        background: var(--bg);
+        color: var(--choice-color);
       }
 
       .CodeMirror-gutters {
@@ -83,7 +87,6 @@
       #play {
         width: 480px;
         height: 320px;
-        color: white;
         position: absolute;
         font-family: monospace;
         padding: 8px;
@@ -268,6 +271,11 @@
       doRunStory()
     }
 
+    function setCssVar(key, value) {
+      document.documentElement.style.setProperty("--" + key, value)
+    }
+
+
     function doRunStory() {
       while (story.canContinue) {
         const content = story.Continue()
@@ -337,13 +345,23 @@
       for (const headerKey of Object.keys(header)) {
         const headerEntry = header[headerKey]
         for (const entryKey of Object.keys(headerEntry)) {
-          headerEntry[entryKey] = applyHeaderRules(headerEntry, entryKey, headerEntry[entryKey])
+          headerEntry[entryKey] = applyHeaderRules(headerEntry, entryKey,
+            headerEntry[entryKey], headerKey)
         }
       }
     }
 
-    function applyHeaderRules(entry, key, value) {
-      console.log("focker", entry, key, value)
+    function applyHeaderRules(entry, key, value, headerKey) {
+      //setCssVar
+      if (headerKey === "text" && key === "color") {
+        setCssVar("text-color", value)
+      }
+      if (headerKey === "choice" && key === "color") {
+        setCssVar("choice-color", value)
+      }
+      if (headerKey === "text" && key === "bg") {
+        setCssVar("bg", value)
+      }
       if (key === "show") {
         if (value === "empty") return " "
       }
@@ -362,7 +380,6 @@
           //instead of "property: content", fix it:
           rest = rest.substring(1).trim()
         }
-        console.log("hummm", key, rest)
         const subobj = {}
         obj[key] = subobj
         const subparts = rest.split(",").map(n => n.trim()).filter(n => n)
@@ -427,9 +444,9 @@
       let ox = 240 - (player.x) * spaceX
       let oy = 160 - (player.y - 1) * spaceY
       ctx.font = '16px monospace';
-      ctx.fillStyle = '#222'
+      ctx.fillStyle = authorData.header.game.bg
       ctx.fillRect(0, 0, 480, 320)
-      ctx.fillStyle = '#fff'
+      ctx.fillStyle = authorData.header.game.color
       loopThroughMap(map, (char, x, y) => {
         const distX = Math.abs(x - player.x)
         const distY = Math.abs(y - player.y)
@@ -437,15 +454,15 @@
         let px = x * spaceX + ox
         let py = y * spaceY + oy
         if (dist > vision) {
-          ctx.fillStyle = "#777"
-          ctx.fillText("█", px, py)
-          ctx.fillStyle = "#fff"
+          ctx.fillStyle = authorData.header.fog.color
+          ctx.fillText(authorData.header.fog.show, px, py)
+          ctx.fillStyle = authorData.header.game.color
           return
         }
         if (player.x === x && player.y === y) {
-          ctx.fillStyle = '#0fc'
-          ctx.fillText("$", px, py)
-          ctx.fillStyle = '#fff'
+          ctx.fillStyle = authorData.header.player.color
+          ctx.fillText(authorData.header.player.show, px, py)
+          ctx.fillStyle = authorData.header.game.color
           return
         }
         if (authorData.header[char]?.show) char = authorData.header[char].show
