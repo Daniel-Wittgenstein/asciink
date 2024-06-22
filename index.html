@@ -137,6 +137,10 @@
 
     const autoSave = "buffy summers"
 
+    const vision = 7.5
+    const vision4Entity = 5.5
+    const visionYStretch = 1
+
     let codeMirror
     let outputDiv
     let story = null
@@ -319,8 +323,17 @@
       ctx.fillRect(0, 0, 480, 320)
       ctx.fillStyle = '#fff'
       loopThroughMap(map, (char, x, y) => {
+        const distX = Math.abs(x - player.x)
+        const distY = Math.abs(y - player.y)
+        const dist = Math.sqrt(distX * distX + distY * distY * visionYStretch)
         let px = x * spaceX + ox
         let py = y * spaceY + oy
+        if (dist > vision) {
+          ctx.fillStyle = "#777"
+          ctx.fillText("█", px, py)
+          ctx.fillStyle = "#fff"
+          return
+        }
         if (player.x === x && player.y === y) {
           ctx.fillStyle = '#0fc'
           ctx.fillText("$", px, py)
@@ -334,7 +347,13 @@
         ctx.fillText(char, px, py)
       })
       ctx.fillStyle = '#c00'
+      let i = -1
       for (const entity of entities) {
+        i++
+        const distX = Math.abs(entity.x - player.x)
+        const distY = Math.abs(entity.y - player.y)
+        const dist = Math.sqrt(distX * distX + distY * distY * visionYStretch)
+        if (distX > vision4Entity) continue
         let px = entity.x * spaceX + ox
         let py = entity.y * spaceY + oy
         ctx.fillText("@", px, py)
