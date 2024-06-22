@@ -92,6 +92,7 @@
         height: 320px;
         position: absolute;
         font-family: monospace;
+        display: none;
       }
 
       #play-inner {
@@ -136,8 +137,7 @@
         <div class="right">
           <div id="play">
             <div id="play-inner">
-              <div id="play-inner-most">   
-                fdffds           
+              <div id="play-inner-most">       
               </div>              
             </div>              
           </div>
@@ -308,6 +308,7 @@
     }
 
     function startTalk(entity) {
+      showTalkBox()
       try {
         story.ChoosePathString(entity.name)
       } catch {
@@ -468,7 +469,16 @@
       return map
     }
 
+    function showTalkBox() {
+      document.getElementById("play").style.display = "block"
+    }
+
+    function hideTalkBox() {
+      document.getElementById("play").style.display = "none"
+    }
+
     function renderMap() {
+      hideTalkBox()
       const map = getCurrentMap()
       const spaceX = 14
       const spaceY = 20
