@@ -511,9 +511,16 @@
           ctx.fillStyle = authorData.header.game.color
           return
         }
-        if (authorData.header[char]?.show) char = authorData.header[char].show
-        if (char === " ") return
-        ctx.fillText(char, px, py)
+        let showChar = char
+        if (authorData.header[char]?.show) showChar = authorData.header[char].show
+        if (showChar === " ") return
+        if (authorData.header[char]?.color) {
+          ctx.fillStyle = authorData.header[char].color
+          ctx.fillText(showChar, px, py)
+          ctx.fillStyle = authorData.header.game.color
+          return
+        }
+        ctx.fillText(showChar, px, py)
       })
       ctx.fillStyle = '#c00'
       let i = -1
