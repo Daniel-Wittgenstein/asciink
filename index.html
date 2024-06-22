@@ -525,6 +525,7 @@
       let i = -1
       for (const entity of entities) {
         i++
+        if (player.x === entity.x && player.y === entity.y) return
         const distX = Math.abs(entity.x - player.x)
         const distY = Math.abs(entity.y - player.y)
         const dist = Math.sqrt(distX * distX + distY * distY * visionYStretch)
