@@ -522,7 +522,6 @@
         }
         ctx.fillText(showChar, px, py)
       })
-      ctx.fillStyle = '#c00'
       let i = -1
       for (const entity of entities) {
         i++
@@ -532,7 +531,8 @@
         if (distX > vision4Entity) continue
         let px = entity.x * spaceX + ox
         let py = entity.y * spaceY + oy
-        ctx.fillText("@", px, py)
+        ctx.fillStyle = authorData.header[entity.name]?.color || "red"
+        ctx.fillText(authorData.header[entity.name]?.show || "@", px, py)
       }
     }
 
