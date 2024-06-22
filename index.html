@@ -29,6 +29,12 @@
         overflow: hidden;
       }
 
+      #error-div {
+        position: absolute;
+        background: black;
+        color: white;
+      }
+
       .main {
         width: 100vw;
         max-width: 1600px;
@@ -144,6 +150,7 @@
           <div id="story"></div>
         </div>
         <div class="right">
+          <div id="error-div"></div>
           <div id="play">
             <div id="play-inner">
               <div id="play-inner-most">       
@@ -178,8 +185,10 @@
     const mapHeight = 24
 
     function error(msg) {
+      //ink can throw several errors one after the other.
+      //so we have to show them all, not just the first or the last one!
       console.log("COMPILE ERROR", msg)
-      outputDiv.innerHTML = `${msg}`
+      errorDiv.innerHTML += `${msg}`
     }
 
     const autoSave = "buffy summers"
@@ -207,6 +216,8 @@
       playIt()      
     }
 
+    let errorDiv
+
     window.onload = startApp
     function startApp() {
 
@@ -217,6 +228,7 @@
       if (EDITOR) initEditorView()
 
       outputDiv = document.getElementById("play-inner-most")
+      errorDiv = document.getElementById("error-div")
 
       if (EDITOR) {
         codeMirror = CodeMirror(document.getElementById("story"), {
@@ -326,6 +338,7 @@
     }
 
     function playIt() {
+      errorDiv.innerHTML = ""
       saveProject()
       outputDiv.innerHTML = ""
       let v = ""
@@ -345,6 +358,7 @@
         console.log(compiler, story)
       } catch(err) {
         console.log("error?", err)
+        error(err)
         return
       }
       authorData = dataObj
