@@ -56,6 +56,15 @@
         height: 100%;
       }
 
+      .text {
+        background: #222;
+      }
+
+      .choice {
+        background: #222;
+        color: #0f0;
+      }
+
       .CodeMirror-gutters {
         background-color: #222;
         border-right: 2px solid #444;
@@ -75,6 +84,8 @@
         height: 320px;
         color: white;
         position: absolute;
+        font-family: monospace;
+        padding: 8px;
       }
 
       #map-canvas {
@@ -123,7 +134,7 @@
 
   <script id="scr">
 
-    const delay = 40
+    const delay = 400
 
     const mapWidth = 48
     const mapHeight = 24
@@ -171,6 +182,11 @@
         const k = ev.key
         let oldX = player.x
         let oldY = player.y
+        if (k === "1" || k === "2" || k === "3" || k === "4" || k === "5" || k === "6" ||
+            k === "7" || k === "8" || k === "9") {
+          const num = Number(k)
+          takeTurn(num - 1)
+        }
         if (k === "ArrowUp") player.y --
         if (k === "ArrowDown") player.y ++
         if (k === "ArrowRight") player.x ++
@@ -191,9 +207,17 @@
           player.x = oldX
           player.y = oldY
         }
+        for (const entity of entities) {
+          if (player.x === entity.x && player.y === entity.y) {
+            renderMap()
+            startTalk(entity)
+            return
+          }
+        }
         if (oldX !== player.x || oldY !== player.y) {
+          cls()
           renderMap()
-        } 
+        }
       })
 
       document.getElementById("play-button").addEventListener("click", (ev) => {
@@ -226,6 +250,37 @@
       if (localStorage.getItem(autoSave)) {
         codeMirror.setValue(localStorage.getItem(autoSave))
       }
+    }
+
+    function takeTurn(choiceIndex) {
+      story.ChooseChoiceIndex (choiceIndex)
+      doRunStory()
+    }
+
+    async function doRunStory() {
+      while (story.canContinue) {
+        const content = story.Continue()
+        console.log("text print", content)
+        print(content, "text")
+        await sleep(delay)
+      }
+      if (story.currentChoices.length > 0) {
+        for (let i = 0; i < story.currentChoices.length; i++) {
+          const choice = story.currentChoices[i]
+          console.log("choice print", choice.text)
+          print((i + 1) + ". " + choice.text, "choice")
+          await sleep(delay)
+        }
+      }
+    }
+
+    function startTalk(entity) {
+      try {
+        story.ChoosePathString(entity.name)
+      } catch {
+        error (`No Ink knot with name "${entity.name}"?`)
+      }
+      doRunStory()
     }
 
     const getFirstWord = (str) => {
@@ -360,15 +415,15 @@
       }
     }
 
-    function isEnglishUpperCaseLetter(char) {
-      return /^[A-Z]$/.test(char)
+    function isEnglishLowerCaseLetter(char) {
+      return /^[a-z]$/.test(char)
     }
 
     function adjustMap(map) {
       let collect = null
       loopThroughMap(map, (char, x, y) => {
         //console.log(char, x, y)
-        if (isEnglishUpperCaseLetter(char) || char === ":") {
+        if (isEnglishLowerCaseLetter(char) || char === ":") {
           if (!collect) {
             collect = char
           } else {
@@ -405,20 +460,6 @@
         }
       }
     }
-
-    /*async function startStory(story) {
-      while (story.canContinue) {
-        print(story.Continue(), "text")
-        await sleep(delay)
-      }
-      if (story.currentChoices.length > 0) {
-        for (let i = 0; i < story.currentChoices.length; i++) {
-          const choice = story.currentChoices [i]
-          print((i + 1) + ". " + choice.text, "choice")
-          await sleep(delay)
-        }
-      }
-    }*/
 
     function cls() {
       outputDiv.innerHTML = ""
