@@ -223,7 +223,10 @@
           block = true
         } else {
           char = map[player.y][player.x]
-          if (char !== "." && char !== " " && char !== "$") block = true
+          if (!authorData.header[char] ||
+            !authorData.header[char].pass || authorData.header[char].pass !== "yes") {
+              block = true
+          }
         }
         if (block) {
           player.x = oldX
