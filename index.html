@@ -186,12 +186,14 @@
             k === "7" || k === "8" || k === "9") {
           const num = Number(k)
           takeTurn(num - 1)
+          return
         }
-        if (k === "ArrowUp") player.y --
-        if (k === "ArrowDown") player.y ++
-        if (k === "ArrowRight") player.x ++
-        if (k === "ArrowLeft") player.x --
-        
+        let walked = false
+        if (k === "ArrowUp" || k === "w") {player.y --; walked = true}
+        if (k === "ArrowDown" || k === "s") {player.y ++; walked = true}
+        if (k === "ArrowRight" || k === "d") {player.x ++; walked = true}
+        if (k === "ArrowLeft" || k === "a") {player.x --; walked = true}
+        if (!walked) return
         const map = getCurrentMap()
         let char
         let block = false
