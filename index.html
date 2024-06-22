@@ -65,10 +65,22 @@
           color: #fff;
       }
 
+      .CodeMirror-overwrite .CodeMirror-cursor {
+        width: auto;
+        border-left: 1px solid red;
+      }
+
       #play {
-        width: 100%;
-        height: 100%;
+        width: 480px;
+        height: 320px;
         color: white;
+        position: absolute;
+      }
+
+      #map-canvas {
+        width: 480px;
+        height: 320px;
+        border: 2px solid #888;
       }
 
       textarea {
@@ -96,6 +108,7 @@
         </div>
         <div class="right">
           <div id="play"></div>
+          <canvas id="map-canvas" width="480" height="320"></canvas>
         </div>
       </div>
       <div class="bottom-bar bar">
@@ -110,6 +123,11 @@
 
   <script id="scr">
 
+    const delay = 40
+
+    const mapWidth = 48
+    const mapHeight = 24
+
     function error(msg) {
       console.log("COMPILE ERROR", msg)
       document.getElementById("play").innerHTML = `
@@ -120,9 +138,16 @@
     const autoSave = "buffy summers"
 
     let codeMirror
+    let outputDiv
+    let story = null
+    let authorData = null
+    let entities = []
+    let ctx = null
+    let player = {x: 3, y: 3}
 
     window.onload = startApp
     function startApp() {
+      outputDiv = document.getElementById("play")
 
       codeMirror = CodeMirror(document.getElementById("story"), {
         value: "",
@@ -132,23 +157,62 @@
         lineNumbers: true,
         lineWrapping: false,
         spellcheck: false,
+        lineWrapping: true,
         extraKeys: {
           "Shift-Tab": "indentLess",
         },
       })
 
+      document.addEventListener("keyup", (ev) => {
+        const k = ev.key
+        let oldX = player.x
+        let oldY = player.y
+        if (k === "ArrowUp") player.y --
+        if (k === "ArrowDown") player.y ++
+        if (k === "ArrowRight") player.x ++
+        if (k === "ArrowLeft") player.x --
+        
+        const map = getCurrentMap()
+        let char
+        let block = false
+        if (!map[player.y]) {
+          block = true
+        } else if (!map[player.y][player.x]) {
+          block = true
+        } else {
+          char = map[player.y][player.x]
+          if (char !== "." && char !== " " && char !== "$") block = true
+        }
+        if (block) {
+          player.x = oldX
+          player.y = oldY
+        }
+        if (oldX !== player.x || oldY !== player.y) {
+          renderMap()
+        } 
+      })
+
       document.getElementById("play-button").addEventListener("click", (ev) => {
         document.getElementById("play").innerHTML = ""
         const v = codeMirror.getValue()
-        let story
+        const [err, dataObj, inkCode] = preprocess(v)
+        console.log("dataObj", dataObj)
+        if (err) {
+          error(err)
+          return
+        }
         try {
-          const compiler = new inkjs.Compiler(v)
+          const compiler = new inkjs.Compiler(inkCode)
           compiler.OnError = (...args) => {error(...args)}
           story = compiler.Compile()
           console.log(compiler, story)
         } catch(err) {
+          console.log("error?", err)
           return
         }
+        authorData = dataObj
+        story.onError = (...args) => error(...args)
+        startStory()
       })
 
       document.getElementById("save-button").addEventListener("click", (ev) => {
@@ -158,8 +222,200 @@
       if (localStorage.getItem(autoSave)) {
         codeMirror.setValue(localStorage.getItem(autoSave))
       }
-
     }
+
+    const getFirstWord = (str) => {
+      /* only looks at whitespace.
+      has no concept of punctuation or word-forming characters
+      so "   word(word2) word3   "
+      will return
+      "word(word2)" as first word! (NOT: "word")
+      */
+      const txt = str.trim()
+      for (let i = 0; i < txt.length; i++) {
+        const char = txt[i]
+        if (char.trim() === "") {
+          return txt.substring(0, i)
+        }
+        if (i === txt.length - 1) {
+          return txt
+        }
+      }
+      return ""
+    }
+
+    const getFirstWordAndRest = (str) => {
+      if (str !== str.trim()) {
+        throw new Error(`The function "getFirstWordAndRest" in module "utils.js" works
+          only with white-space-trimmed strings. You passed a non-white-space trimmed string.`)
+      }
+      const firstWord = getFirstWord(str)
+      return [firstWord, str.substring(firstWord.length)]
+    }
+
+    function preprocess(str) {
+      let err = false
+      let dataObj = {}
+      let inkCode = ""
+      const parts = str.split("\n@@@===")
+      dataObj.header = parts[0]
+      dataObj.maps = processMaps(parts[1])
+      inkCode = parts[2]
+      return [err, dataObj, inkCode]
+    }
+
+    function processMaps(str) {
+      const mapsObj = {}
+      let firstMapName = ""
+      const maps = str.split("\nMAP:").map(n => n.trim()).filter(n => n)
+      for (const map of maps) {
+        let map2 = map.trim()
+        const [mapName, rest] = getFirstWordAndRest(map2)
+        mapsObj[mapName] = createMap(rest)
+        if (!firstMapName) firstMapName = mapName
+      }
+      mapsObj.$firstMapName = firstMapName
+      return mapsObj
+    }
+
+    function createMap(str) {
+      const lines = str.split("\n")
+      let y = -1
+      const grid = []
+      for (const line of lines) {
+        y++
+        grid[y] = []
+        let x = -1
+        if (y > mapHeight) break
+        for (const char of line) {
+          x++
+          if (x > mapWidth) break
+          grid[y][x] = char
+        }
+      }
+      adjustMap(grid)
+      return grid
+    }
+
+    function startStory() {
+      ctx = document.getElementById("map-canvas").getContext("2d")
+      renderMap()
+    }
+
+    function getCurrentMap() {
+      const map = authorData.maps[authorData.maps.$firstMapName]
+      return map
+    }
+
+    function renderMap() {
+      const map = getCurrentMap()
+      const spaceX = 14
+      const spaceY = spaceX
+      let ox = 240 - (player.x) * spaceX
+      let oy = 160 - (player.y - 1) * spaceY
+      const fontSize = spaceX
+      ctx.font = '16px monospace';
+      ctx.fillStyle = '#222'
+      ctx.fillRect(0, 0, 480, 320)
+      ctx.fillStyle = '#fff'
+      loopThroughMap(map, (char, x, y) => {
+        let px = x * spaceX + ox
+        let py = y * spaceY + oy
+        if (player.x === x && player.y === y) {
+          ctx.fillStyle = '#0fc'
+          ctx.fillText("$", px, py)
+          ctx.fillStyle = '#fff'
+          return
+        }
+        if (char === "." || char === "") return
+        if (char === "$") {
+          char = "#"
+        }
+        ctx.fillText(char, px, py)
+      })
+      ctx.fillStyle = '#c00'
+      for (const entity of entities) {
+        let px = entity.x * spaceX + ox
+        let py = entity.y * spaceY + oy
+        ctx.fillText("@", px, py)
+      }
+    }
+
+    function isEnglishUpperCaseLetter(char) {
+      return /^[A-Z]$/.test(char)
+    }
+
+    function adjustMap(map) {
+      let collect = null
+      loopThroughMap(map, (char, x, y) => {
+        //console.log(char, x, y)
+        if (isEnglishUpperCaseLetter(char) || char === ":") {
+          if (!collect) {
+            collect = char
+          } else {
+            collect += char
+          }
+          map[y][x] = "."
+        } else {
+          if (collect) {
+            let xPos = 0
+            if (collect.startsWith(":")) {
+              xPos = x - collect.length
+            } else {
+              xPos = x - 1
+            }
+            entities.push({
+              x: xPos,
+              y,
+              name: collect.replaceAll(":", ""),
+            })
+            collect = null
+          }
+        }
+      })
+    }
+
+    function loopThroughMap(map, func) {
+      let y = -1
+      for (const item of map) {
+        y++
+        let x = -1
+        for (const item2 of item) {
+          x++
+          func(item2, x, y)
+        }
+      }
+    }
+
+    /*async function startStory(story) {
+      while (story.canContinue) {
+        print(story.Continue(), "text")
+        await sleep(delay)
+      }
+      if (story.currentChoices.length > 0) {
+        for (let i = 0; i < story.currentChoices.length; i++) {
+          const choice = story.currentChoices [i]
+          print((i + 1) + ". " + choice.text, "choice")
+          await sleep(delay)
+        }
+      }
+    }*/
+
+    function cls() {
+      outputDiv.innerHTML = ""
+    }
+
+    function print(text, cssClass) {
+      outputDiv.innerHTML += `<div class="${cssClass}">${text}</div>`
+    }
+
+    function sleep(time) {
+      return new Promise(n => setTimeout(n, time))
+    }
+
+
+//_inkStory.ChooseChoiceIndex (index);
+
 
   </script>
 
