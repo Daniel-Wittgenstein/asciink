@@ -327,9 +327,27 @@
       let inkCode = ""
       const parts = str.split("\n@@@===")
       dataObj.header = processHeader(parts[0])
+      adjustHeader(dataObj.header)
       dataObj.maps = processMaps(parts[1])
       inkCode = parts[2]
       return [err, dataObj, inkCode]
+    }
+
+    function adjustHeader(header) {
+      for (const headerKey of Object.keys(header)) {
+        const headerEntry = header[headerKey]
+        for (const entryKey of Object.keys(headerEntry)) {
+          headerEntry[entryKey] = applyHeaderRules(headerEntry, entryKey, headerEntry[entryKey])
+        }
+      }
+    }
+
+    function applyHeaderRules(entry, key, value) {
+      console.log("focker", entry, key, value)
+      if (key === "show") {
+        if (value === "empty") return " "
+      }
+      return value
     }
 
     function processHeader(str) {
@@ -352,23 +370,11 @@
           const parts = subpart.split(":")
           const key = parts[0].trim()
           let value = parts[1].trim()
-          value = applyHeaderRules(key, value)
           subobj[key] = value
         }
       }
       return obj
     }
-
-    function applyHeaderRules(key, value) {
-      if (key === "show" && value === "empty") {
-        return " "
-      }
-      if (key === "show" && value.length > 1) {
-        return value.substring(0, 1)
-      }
-      return value
-    }
-
 
     function processMaps(str) {
       const mapsObj = {}
@@ -416,10 +422,10 @@
     function renderMap() {
       const map = getCurrentMap()
       const spaceX = 14
-      const spaceY = spaceX
+      const spaceY = 20
+      const fontSize = 14
       let ox = 240 - (player.x) * spaceX
       let oy = 160 - (player.y - 1) * spaceY
-      const fontSize = spaceX
       ctx.font = '16px monospace';
       ctx.fillStyle = '#222'
       ctx.fillRect(0, 0, 480, 320)
