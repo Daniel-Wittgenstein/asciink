@@ -29,10 +29,16 @@
         overflow: hidden;
       }
 
+      .code-editor-error-line {
+        background: red;
+        color: white;
+      }
+
       #error-div {
         position: absolute;
         background: black;
         color: white;
+        font-family: monospace;
       }
 
       .main {
@@ -184,11 +190,27 @@
     const mapWidth = 48
     const mapHeight = 24
 
-    function error(msg) {
+    function error(msg, source) {
       //ink can throw several errors one after the other.
       //so we have to show them all, not just the first or the last one!
-      console.log("COMPILE ERROR", msg)
-      errorDiv.innerHTML += `${msg}`
+      msg = String(msg)
+      console.log("COMPILE ERROR", msg, LINES_OFFSET)
+      const match = msg.match(/line (\d+)/)
+      let num = 0
+      if (match) {
+        num = Number(match[1])
+        msg = msg.replace(/line (\d+)/, "")
+      }
+      errorDiv.innerHTML += `${msg}<br>`
+      errorDiv.innerHTML += `source: ${source}<br>`
+      const realLineNr = num + LINES_OFFSET
+      errorDiv.innerHTML += `LINE: ${realLineNr}<br><br>`
+      if (EDITOR) {
+        const marginFromTop = 100
+        codeMirror.addLineClass(realLineNr - 1, "wrap", "code-editor-error-line")
+        codeMirror.scrollIntoView({line: realLineNr - 1, char: 1}, marginFromTop)
+      }
+
     }
 
     const autoSave = "buffy summers"
@@ -204,6 +226,7 @@
     let entities = []
     let ctx = null
     let player = {x: 3, y: 3}
+    let LINES_OFFSET = 0
 
     let EDITOR = true
 
@@ -244,6 +267,9 @@
             "Shift-Tab": "indentLess",
           },
         })
+
+        codeMirror.on("focus", function() { cleanEditor() })  
+
       }
 
       document.addEventListener("keyup", (ev) => {
@@ -337,6 +363,35 @@
       doRunStory()
     }
 
+    function getSecondOccurrenceIndex(str, sub) {
+      const i = str.indexOf(sub)
+      if (i === -1) return -1
+      const rest = str.substring(i + 1)
+      const i2 = rest.indexOf(sub)
+      if (i2 === -1) return -1
+      const index = i2 + i + 1
+      return index
+    }
+
+    function countLinesUntil(str, targetIndex) {
+      let count = 0
+      let i = -1
+      for (const char of str) {
+        i++
+        if (i >= targetIndex) break
+        if (char === "\n") count++
+      }
+      return count
+    }
+
+    function cleanEditor() {
+      if (EDITOR) {
+        for (let i = 0; i < codeMirror.lineCount(); i++) { //unfortunately, this is necessary
+          codeMirror.removeLineClass(i, "wrap")
+        }
+      }
+    }
+
     function playIt() {
       errorDiv.innerHTML = ""
       saveProject()
@@ -345,6 +400,10 @@
       if (EDITOR) v = codeMirror.getValue()
       if (!EDITOR) v = window.$userStoryData.data
       
+      //find second instance of str
+      const secIndex = getSecondOccurrenceIndex(v, "\n@@@===")
+      LINES_OFFSET = countLinesUntil(v, secIndex)
+
       const [err, dataObj, inkCode] = preprocess(v)
       console.log("dataObj", dataObj)
       if (err) {
@@ -353,16 +412,15 @@
       }
       try {
         const compiler = new inkjs.Compiler(inkCode)
-        compiler.OnError = (...args) => {error(...args)}
+        compiler.OnError = (err) => {error(err, "compiler.OnError")}
         story = compiler.Compile()
         console.log(compiler, story)
       } catch(err) {
-        console.log("error?", err)
-        error(err)
+        //error(err, "catch")
         return
       }
       authorData = dataObj
-      story.onError = (...args) => error(...args)
+      story.onError = (err) => error(err, "story.onError")
       startStory()
     }
 
