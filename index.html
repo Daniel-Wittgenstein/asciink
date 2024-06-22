@@ -405,6 +405,7 @@
       LINES_OFFSET = countLinesUntil(v, secIndex)
 
       const [err, dataObj, inkCode] = preprocess(v)
+
       console.log("dataObj", dataObj)
       if (err) {
         error(err)
@@ -439,6 +440,45 @@
       document.documentElement.style.setProperty("--" + key, value)
     }
 
+    function getDefaultSettings() {
+      return {
+        "title": {
+            "title": "Unnamed Game"
+        },
+        "game": {
+            "color": "white",
+            "bg": "black"
+        },
+        "text": {
+            "color": "white",
+            "bg": "black"
+        },
+        "choice": {
+            "color": "white"
+        },
+        "border": {
+            "color": "blue",
+            "padding": "yes",
+            "border": "yes"
+        },
+        "player": {
+            "color": "#0ff",
+            "show": "⌖"
+        },
+        "fog": {
+            "color": "#444",
+            "show": "█"
+        },
+        ".": {
+            "show": " ",
+            "pass": "yes"
+        },
+        " ": {
+            "show": " ",
+            "pass": "yes"
+        },
+      }
+    }
 
     function doRunStory() {
       while (story.canContinue) {
@@ -499,7 +539,9 @@
       let dataObj = {}
       let inkCode = ""
       const parts = str.split("\n@@@===")
-      dataObj.header = processHeader(parts[0])
+      const defaultObj = getDefaultSettings()
+      processHeader(defaultObj, parts[0])
+      dataObj.header = defaultObj
       adjustHeader(dataObj.header)
       dataObj.maps = processMaps(parts[1])
       inkCode = parts[2]
@@ -549,9 +591,8 @@
       return value
     }
 
-    function processHeader(str) {
+    function processHeader(obj, str) {
       const lines = str.split("\n").map(n => n.trim()).filter(n => n)
-      const obj = {}
       for (const line of lines) {
         let [key, rest] = getFirstWordAndRest(line)
         key = key.replace(":", "").trim()
@@ -571,7 +612,6 @@
           subobj[key] = value
         }
       }
-      return obj
     }
 
     function processMaps(str) {
