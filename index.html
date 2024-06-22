@@ -2,7 +2,9 @@
   <head>
     <meta charset="utf-8">
     <title>asciink</title>
+    <!--DEV-->
     <link rel="stylesheet" href="code-mirror-lib/codemirror.css">
+    <!--END_DEV-->
     <style>
       :root {
         --bar-height: 32px;
@@ -147,12 +149,19 @@
       <div class="bottom-bar bar">
         <button id="play-button">Play</button>
         <button id="save-button">Save</button>
+        <button id="export-button">Export</button>
       </div>
     </div>
-  </body>
 
+  <!--DEV-->
   <script src="code-mirror-lib/codemirror.js"></script>
   <script src="./ink/ink-full.js"></script>
+  <script src="./auto-generated/exportHtmlData.js"></script>
+  <!--END_DEV-->
+
+  <!--INJECT-->
+
+  <!--INJECT_STORY-->
 
   <script id="scr">
 
@@ -160,6 +169,7 @@
       to do:
       - IMPORTANT: show errors set display to block on error
       - export
+      - load demo game when no localstorage
       - proper reload play reset entities when testing again etc.
       - docs link or display
       - end game from ink
@@ -196,23 +206,32 @@
     let ctx = null
     let player = {x: 3, y: 3}
 
+    let EDITOR = true
+
     window.onload = startApp
     function startApp() {
+
+      if (!window.$exportedHtmlData) {
+        EDITOR = false
+      }
+
       outputDiv = document.getElementById("play-inner-most")
 
-      codeMirror = CodeMirror(document.getElementById("story"), {
-        value: "",
-        indentUnit: 2,
-        tabSize: 2,
-        indentWithTabs: false,
-        lineNumbers: true,
-        lineWrapping: false,
-        spellcheck: false,
-        lineWrapping: true,
-        extraKeys: {
-          "Shift-Tab": "indentLess",
-        },
-      })
+      if (EDITOR) {
+        codeMirror = CodeMirror(document.getElementById("story"), {
+          value: "",
+          indentUnit: 2,
+          tabSize: 2,
+          indentWithTabs: false,
+          lineNumbers: true,
+          lineWrapping: false,
+          spellcheck: false,
+          lineWrapping: true,
+          extraKeys: {
+            "Shift-Tab": "indentLess",
+          },
+        })
+      }
 
       document.addEventListener("keyup", (ev) => {
         const k = ev.key
@@ -262,31 +281,20 @@
       })
 
       document.getElementById("play-button").addEventListener("click", (ev) => {
-        saveProject()
-        outputDiv.innerHTML = ""
-        const v = codeMirror.getValue()
-        const [err, dataObj, inkCode] = preprocess(v)
-        console.log("dataObj", dataObj)
-        if (err) {
-          error(err)
-          return
-        }
-        try {
-          const compiler = new inkjs.Compiler(inkCode)
-          compiler.OnError = (...args) => {error(...args)}
-          story = compiler.Compile()
-          console.log(compiler, story)
-        } catch(err) {
-          console.log("error?", err)
-          return
-        }
-        authorData = dataObj
-        story.onError = (...args) => error(...args)
-        startStory()
+        playIt()
       })
 
       document.getElementById("save-button").addEventListener("click", (ev) => {
         saveProject()
+      })
+
+      document.getElementById("export-button").addEventListener("click", (ev) => {
+        playIt()
+        let ht = window.$exportedHtmlData.data
+        ht = ht.replace(/\<title\>.*?\<\/title\>/, () => {
+          return "<title>" + (authorData.header.title?.title || "unnamed game") + "</title>"
+        })
+        download(ht, "export.html")
       })
 
       if (localStorage.getItem(autoSave)) {
@@ -305,6 +313,41 @@
       cls()
       story.ChooseChoiceIndex (choiceIndex)
       doRunStory()
+    }
+
+    function playIt() {
+      saveProject()
+      outputDiv.innerHTML = ""
+      const v = codeMirror.getValue()
+      const [err, dataObj, inkCode] = preprocess(v)
+      console.log("dataObj", dataObj)
+      if (err) {
+        error(err)
+        return
+      }
+      try {
+        const compiler = new inkjs.Compiler(inkCode)
+        compiler.OnError = (...args) => {error(...args)}
+        story = compiler.Compile()
+        console.log(compiler, story)
+      } catch(err) {
+        console.log("error?", err)
+        return
+      }
+      authorData = dataObj
+      story.onError = (...args) => error(...args)
+      startStory()
+    }
+
+
+    function download(html, fileName) {
+      const blob = new Blob([html], {type: 'text/html'})
+      const link = document.createElement("a")
+      link.download = fileName
+      link.href = window.URL.createObjectURL(blob)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     }
 
     function setCssVar(key, value) {
@@ -612,5 +655,5 @@
 
 
   </script>
-
+  </body>
 </html>
