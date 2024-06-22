@@ -44,6 +44,7 @@
       .right {
         width: 50%;
         height: 100%;
+        background: #444;
       }
 
       #story {
@@ -91,7 +92,7 @@
       #map-canvas {
         width: 480px;
         height: 320px;
-        border: 2px solid #888;
+        border: 0px solid #888;
       }
 
       textarea {
@@ -255,6 +256,9 @@
     }
 
     function takeTurn(choiceIndex) {
+      if (choiceIndex > story.currentChoices.length - 1) {
+        return
+      }
       story.ChooseChoiceIndex (choiceIndex)
       doRunStory()
     }
