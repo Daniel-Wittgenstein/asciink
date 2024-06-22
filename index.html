@@ -32,21 +32,24 @@
         width: 100vw;
         max-width: 1600px;
         height: calc(100vh - var(--bar-height));
-        border: 2px solid #444;
         display: flex;
         flex-direction: row;
+
+        align-items: center;
+        justify-content: center;
       }
 
       .bar {
         height: var(--bar-height);
         color: white;
-        display: flex;
+        display: none;
         align-items: center;
       }
       
       .left {
         width: 50%;
         height: 100%;
+        display: none;
       }
       
       .right {
@@ -208,12 +211,25 @@
 
     let EDITOR = true
 
+    function initEditorView() {
+      document.querySelector(".left").style.display = "block"
+      document.querySelector(".bottom-bar").style.display = "flex"
+    }
+
+    function startExportedGame() {
+      playIt()      
+    }
+
     window.onload = startApp
     function startApp() {
 
       if (!window.$exportedHtmlData) {
         EDITOR = false
       }
+
+          //EDITOR = 0 //TESTING ONLY
+
+      if (EDITOR) initEditorView()
 
       outputDiv = document.getElementById("play-inner-most")
 
@@ -294,15 +310,24 @@
         ht = ht.replace(/\<title\>.*?\<\/title\>/, () => {
           return "<title>" + (authorData.header.title?.title || "unnamed game") + "</title>"
         })
+        const xx = JSON.stringify({data:codeMirror.getValue()})
+        ht = ht.replace("<!--INJECT_STORY-->", `
+          <script>window.$userStoryData = ${xx}<\/script>
+        `)
         download(ht, "export.html")
       })
 
       if (localStorage.getItem(autoSave)) {
-        codeMirror.setValue(localStorage.getItem(autoSave))
+        if (EDITOR) {
+          codeMirror.setValue(localStorage.getItem(autoSave))
+        }
       }
+
+      if (!EDITOR) startExportedGame()
     }
 
     function saveProject() {
+      if (!EDITOR) return
       localStorage.setItem(autoSave, codeMirror.getValue())
     }
 
@@ -318,7 +343,10 @@
     function playIt() {
       saveProject()
       outputDiv.innerHTML = ""
-      const v = codeMirror.getValue()
+      let v = ""
+      if (EDITOR) v = codeMirror.getValue()
+      if (!EDITOR) v = window.$userStoryData.data
+      
       const [err, dataObj, inkCode] = preprocess(v)
       console.log("dataObj", dataObj)
       if (err) {
