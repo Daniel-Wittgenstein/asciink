@@ -321,11 +321,39 @@
       let dataObj = {}
       let inkCode = ""
       const parts = str.split("\n@@@===")
-      dataObj.header = parts[0]
+      dataObj.header = processHeader(parts[0])
       dataObj.maps = processMaps(parts[1])
       inkCode = parts[2]
       return [err, dataObj, inkCode]
     }
+
+    function processHeader(str) {
+      const lines = str.split("\n").map(n => n.trim()).filter(n => n)
+      const obj = {}
+      for (const line of lines) {
+        let [key, rest] = getFirstWordAndRest(line)
+        key = key.replace(":", "").trim()
+        rest = rest.trim()
+        if (rest.startsWith(":")) {
+          //if story author does: "property : content"
+          //instead of "property: content", fix it:
+          rest = rest.substring(1).trim()
+        }
+        console.log("hummm", key, rest)
+        const subobj = {}
+        obj[key] = subobj
+        const subparts = rest.split(",").map(n => n.trim()).filter(n => n)
+        for (subpart of subparts) {
+          const parts = subpart.split(":")
+          const key = parts[0].trim()
+          const value = parts[1].trim()
+          console.log(1, key, value)
+          subobj[key] = value
+        }
+      }
+      return obj
+    }
+
 
     function processMaps(str) {
       const mapsObj = {}
