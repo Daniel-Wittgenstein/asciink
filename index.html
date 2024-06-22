@@ -2,6 +2,7 @@
   <head>
     <meta charset="utf-8">
     <title>asciink</title>
+    <link rel="stylesheet" href="code-mirror-lib/codemirror.css">
     <style>
       :root {
         --bar-height: 32px;
@@ -21,7 +22,7 @@
 
       .main {
         width: 100vw;
-        max-width: 960px;
+        max-width: 1200px;
         height: calc(100vh - var(--bar-height));
         border: 2px solid #444;
         display: flex;
@@ -48,6 +49,20 @@
       #story {
         width: 100%;
         height: 100%;
+      }
+
+      .CodeMirror {
+        width: 100%;
+        height: 100%;
+      }
+
+      .CodeMirror-gutters {
+        background-color: #222;
+        border-right: 2px solid #444;
+      }
+
+      .CodeMirror-linenumber {
+          color: #fff;
       }
 
       #play {
@@ -77,9 +92,7 @@
     <div class="app">
       <div class="main">
         <div class="left">
-          <textarea id="story"
-          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-          ></textarea>
+          <div id="story"></div>
         </div>
         <div class="right">
           <div id="play"></div>
@@ -92,8 +105,8 @@
     </div>
   </body>
 
-
-  <script src="./lib/ink-full.js"></script>
+  <script src="code-mirror-lib/codemirror.js"></script>
+  <script src="./ink/ink-full.js"></script>
 
   <script id="scr">
 
@@ -106,11 +119,27 @@
 
     const autoSave = "buffy summers"
 
+    let codeMirror
+
     window.onload = startApp
     function startApp() {
+
+      codeMirror = CodeMirror(document.getElementById("story"), {
+        value: "",
+        indentUnit: 2,
+        tabSize: 2,
+        indentWithTabs: false,
+        lineNumbers: true,
+        lineWrapping: false,
+        spellcheck: false,
+        extraKeys: {
+          "Shift-Tab": "indentLess",
+        },
+      })
+
       document.getElementById("play-button").addEventListener("click", (ev) => {
         document.getElementById("play").innerHTML = ""
-        const v = document.getElementById("story").value
+        const v = codeMirror.getValue()
         let story
         try {
           const compiler = new inkjs.Compiler(v)
@@ -127,7 +156,7 @@
       })
 
       if (localStorage.getItem(autoSave)) {
-        document.getElementById("story").value = localStorage.getItem(autoSave)
+        codeMirror.setValue(localStorage.getItem(autoSave))
       }
 
     }
