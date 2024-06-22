@@ -1,0 +1,137 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>asciink</title>
+    <style>
+      :root {
+        --bar-height: 32px;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: #222;
+        color: white;
+        display: flex;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .main {
+        width: 100vw;
+        max-width: 960px;
+        height: calc(100vh - var(--bar-height));
+        border: 2px solid #444;
+        display: flex;
+        flex-direction: row;
+      }
+
+      .bar {
+        height: var(--bar-height);
+        color: white;
+        display: flex;
+        align-items: center;
+      }
+      
+      .left {
+        width: 50%;
+        height: 100%;
+      }
+      
+      .right {
+        width: 50%;
+        height: 100%;
+      }
+
+      #story {
+        width: 100%;
+        height: 100%;
+      }
+
+      #play {
+        width: 100%;
+        height: 100%;
+        color: white;
+      }
+
+      textarea {
+        resize: none;
+        background: #222;
+        color: white;
+        font-family: monospace;
+        font-size: 14px;
+        padding: 7px;
+      }
+
+      button {
+        max-height: calc(var(--bar-height) - 4px);
+        font-size: 12px;
+        margin: 4px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="main">
+        <div class="left">
+          <textarea id="story"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          ></textarea>
+        </div>
+        <div class="right">
+          <div id="play"></div>
+        </div>
+      </div>
+      <div class="bottom-bar bar">
+        <button id="play-button">Play</button>
+        <button id="save-button">Save</button>
+      </div>
+    </div>
+  </body>
+
+
+  <script src="./lib/ink-full.js"></script>
+
+  <script id="scr">
+
+    function error(msg) {
+      console.log("COMPILE ERROR", msg)
+      document.getElementById("play").innerHTML = `
+          ${msg}
+      `
+    }
+
+    const autoSave = "buffy summers"
+
+    window.onload = startApp
+    function startApp() {
+      document.getElementById("play-button").addEventListener("click", (ev) => {
+        document.getElementById("play").innerHTML = ""
+        const v = document.getElementById("story").value
+        let story
+        try {
+          const compiler = new inkjs.Compiler(v)
+          compiler.OnError = (...args) => {error(...args)}
+          story = compiler.Compile()
+          console.log(compiler, story)
+        } catch(err) {
+          return
+        }
+      })
+
+      document.getElementById("save-button").addEventListener("click", (ev) => {
+        localStorage.setItem(autoSave, document.getElementById("story").value)
+      })
+
+      if (localStorage.getItem(autoSave)) {
+        document.getElementById("story").value = localStorage.getItem(autoSave)
+      }
+
+    }
+
+  </script>
+
+</html>
