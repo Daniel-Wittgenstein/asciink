@@ -22,7 +22,7 @@
 
       .main {
         width: 100vw;
-        max-width: 1200px;
+        max-width: 1600px;
         height: calc(100vh - var(--bar-height));
         border: 2px solid #444;
         display: flex;
@@ -152,7 +152,7 @@
       })
 
       document.getElementById("save-button").addEventListener("click", (ev) => {
-        localStorage.setItem(autoSave, document.getElementById("story").value)
+        localStorage.setItem(autoSave, codeMirror.getValue())
       })
 
       if (localStorage.getItem(autoSave)) {
