@@ -170,6 +170,7 @@
         <button id="play-button">Play</button>
         <button id="save-button">Save</button>
         <button id="export-button">Export</button>
+        <button id="help-button">Help</button>
       </div>
     </div>
 
@@ -177,6 +178,7 @@
   <script src="code-mirror-lib/codemirror.js"></script>
   <script src="./ink/ink-full.js"></script>
   <script src="./auto-generated/exportHtmlData.js"></script>
+  <script src="./helpContents.js"></script>
   <!--END_DEV-->
 
   <!--INJECT-->
@@ -335,6 +337,15 @@
       document.getElementById("save-button").addEventListener("click", (ev) => {
         saveProject()
       })
+
+      document.getElementById("help-button").addEventListener("click", function(event) {
+          event.preventDefault()
+          const htmlContent = window.helpContents
+          const newWindow = window.open()
+          newWindow.document.write(htmlContent)
+          newWindow.document.close()
+      })
+
 
       document.getElementById("export-button").addEventListener("click", (ev) => {
         playIt()
