@@ -23,6 +23,7 @@
         color: white;
         display: flex;
         justify-content: center;
+        align-items: center;
         width: 100vw;
         height: 100vh;
         overflow: hidden;
@@ -56,6 +57,9 @@
       .right {
         width: 50%;
         height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       #story {
@@ -209,8 +213,6 @@
       if (!window.$exportedHtmlData) {
         EDITOR = false
       }
-
-          //EDITOR = 0 //TESTING ONLY
 
       if (EDITOR) initEditorView()
 

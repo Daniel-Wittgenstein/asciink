@@ -1,7 +1,6 @@
 
       to do:
       - IMPORTANT: show errors set display to block on error
-      - export
       - load demo game when no localstorage
       - proper reload play reset entities when testing again etc.
       - docs link or display
