@@ -8,7 +8,10 @@
         --bar-height: 32px;
         --bg: #222;
         --choice-color: yellow;
-        --text-color: purple; 
+        --text-color: purple;
+        --text-box-padding: 16px;
+        --text-box-border-size: 16px;
+        --text-box-border-color: white;
       }
 
       body {
@@ -89,7 +92,16 @@
         height: 320px;
         position: absolute;
         font-family: monospace;
-        padding: 8px;
+      }
+
+      #play-inner {
+        padding: 20px;
+      }
+
+      #play-inner-most {
+        padding: var(--text-box-padding);
+        background: var(--bg);
+        border: var(--text-box-border-size) solid var(--text-box-border-color);
       }
 
       #map-canvas {
@@ -122,7 +134,13 @@
           <div id="story"></div>
         </div>
         <div class="right">
-          <div id="play"></div>
+          <div id="play">
+            <div id="play-inner">
+              <div id="play-inner-most">   
+                fdffds           
+              </div>              
+            </div>              
+          </div>
           <canvas id="map-canvas" width="480" height="320"></canvas>
         </div>
       </div>
@@ -145,9 +163,7 @@
 
     function error(msg) {
       console.log("COMPILE ERROR", msg)
-      document.getElementById("play").innerHTML = `
-          ${msg}
-      `
+      outputDiv.innerHTML = `${msg}`
     }
 
     const autoSave = "buffy summers"
@@ -166,7 +182,7 @@
 
     window.onload = startApp
     function startApp() {
-      outputDiv = document.getElementById("play")
+      outputDiv = document.getElementById("play-inner-most")
 
       codeMirror = CodeMirror(document.getElementById("story"), {
         value: "",
@@ -228,7 +244,7 @@
 
       document.getElementById("play-button").addEventListener("click", (ev) => {
         saveProject()
-        document.getElementById("play").innerHTML = ""
+        outputDiv.innerHTML = ""
         const v = codeMirror.getValue()
         const [err, dataObj, inkCode] = preprocess(v)
         console.log("dataObj", dataObj)
@@ -356,15 +372,31 @@
       if (headerKey === "text" && key === "color") {
         setCssVar("text-color", value)
       }
+
       if (headerKey === "choice" && key === "color") {
         setCssVar("choice-color", value)
       }
+
       if (headerKey === "text" && key === "bg") {
         setCssVar("bg", value)
       }
+
+      if (headerKey === "border" && key === "color") {
+        setCssVar("text-box-border-color", value)
+      }
+
+      if (headerKey === "border" && key === "border") {
+        setCssVar("text-box-border-size", value === "yes" ? "16px" : "0px")
+      }
+
+      if (headerKey === "border" && key === "padding") {
+        setCssVar("text-box-padding", value === "yes" ? "16px" : "0px")
+      }
+
       if (key === "show") {
         if (value === "empty") return " "
       }
+
       return value
     }
 
