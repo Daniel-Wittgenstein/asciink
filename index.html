@@ -224,6 +224,7 @@
       })
 
       document.getElementById("play-button").addEventListener("click", (ev) => {
+        saveProject()
         document.getElementById("play").innerHTML = ""
         const v = codeMirror.getValue()
         const [err, dataObj, inkCode] = preprocess(v)
@@ -247,12 +248,16 @@
       })
 
       document.getElementById("save-button").addEventListener("click", (ev) => {
-        localStorage.setItem(autoSave, codeMirror.getValue())
+        saveProject()
       })
 
       if (localStorage.getItem(autoSave)) {
         codeMirror.setValue(localStorage.getItem(autoSave))
       }
+    }
+
+    function saveProject() {
+      localStorage.setItem(autoSave, codeMirror.getValue())
     }
 
     function takeTurn(choiceIndex) {
