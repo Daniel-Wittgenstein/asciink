@@ -222,10 +222,13 @@
     let codeMirror
     let outputDiv
     let story = null
+    
     let authorData = null
     let entities = []
+    let player = null
+
     let ctx = null
-    let player = {x: 3, y: 3}
+
     let LINES_OFFSET = 0
 
     let EDITOR = true
@@ -237,6 +240,12 @@
 
     function startExportedGame() {
       playIt()      
+    }
+
+    function resetGameState() {
+      entities = []
+      authorData = null
+      player = {x: 3, y: 3}
     }
 
     let errorDiv
@@ -403,6 +412,8 @@
       //find second instance of str
       const secIndex = getSecondOccurrenceIndex(v, "\n@@@===")
       LINES_OFFSET = countLinesUntil(v, secIndex)
+
+      resetGameState()
 
       const [err, dataObj, inkCode] = preprocess(v)
 

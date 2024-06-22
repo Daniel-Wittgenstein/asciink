@@ -1,6 +1,5 @@
 
       to do:
-      - proper reload play reset entities when testing again etc.
       - docs link or display
 
       - load demo game when no localstorage
