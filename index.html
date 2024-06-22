@@ -187,6 +187,8 @@
 
   <script id="scr">
 
+    const BLOCK_SEPARATOR = "@NEXT-BLOCK@"
+
     const delay = 400
 
     const mapWidth = 48
@@ -421,7 +423,7 @@
       if (!EDITOR) v = window.$userStoryData.data
       
       //find second instance of str
-      const secIndex = getSecondOccurrenceIndex(v, "\n@@@===")
+      const secIndex = getSecondOccurrenceIndex(v, BLOCK_SEPARATOR)
       LINES_OFFSET = countLinesUntil(v, secIndex)
 
       resetGameState()
@@ -446,7 +448,6 @@
       story.onError = (err) => error(err, "story.onError")
       startStory()
     }
-
 
     function download(html, fileName) {
       const blob = new Blob([html], {type: 'text/html'})
@@ -560,7 +561,7 @@
       let err = false
       let dataObj = {}
       let inkCode = ""
-      const parts = str.split("\n@@@===")
+      const parts = str.split(BLOCK_SEPARATOR)
       const defaultObj = getDefaultSettings()
       processHeader(defaultObj, parts[0])
       dataObj.header = defaultObj
