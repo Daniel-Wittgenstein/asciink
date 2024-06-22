@@ -351,12 +351,22 @@
         for (subpart of subparts) {
           const parts = subpart.split(":")
           const key = parts[0].trim()
-          const value = parts[1].trim()
-          console.log(1, key, value)
+          let value = parts[1].trim()
+          value = applyHeaderRules(key, value)
           subobj[key] = value
         }
       }
       return obj
+    }
+
+    function applyHeaderRules(key, value) {
+      if (key === "show" && value === "empty") {
+        return " "
+      }
+      if (key === "show" && value.length > 1) {
+        return value.substring(0, 1)
+      }
+      return value
     }
 
 
@@ -432,10 +442,8 @@
           ctx.fillStyle = '#fff'
           return
         }
-        if (char === "." || char === "") return
-        if (char === "$") {
-          char = "#"
-        }
+        if (authorData.header[char]?.show) char = authorData.header[char].show
+        if (char === " ") return
         ctx.fillText(char, px, py)
       })
       ctx.fillStyle = '#c00'
