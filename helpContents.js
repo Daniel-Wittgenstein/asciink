@@ -22,6 +22,19 @@ window.helpContents = `
   </head>
   <body>
   <h1>ASCIINK</h1>
+  
+  <div>
+  <b>When you click "save" or "play", asciink saves your game
+  in your browser's local storage. You should still make
+  backup copies of your game for safety.
+  Just copy all the text into a text file, save it and
+  you have yourself a backup.</b><br><br>
+
+  <b>You can do anything you want with your games created with asciink, including
+  selling them. Any commercial or non-commercial use is explicitly allowed.</b><br><br>
+
+  </div>
+  
   <div>
   Every asciink game consists of three blocks separated by a line with this special sequence:
   <br><br>
