@@ -527,9 +527,35 @@
       player.gameOver = true
     }
 
+    function movePlayerToPos(x, y) {
+      player.x = x
+      player.y = y
+      renderMap(false)
+    }
+
     function movePlayerToMap(targetMap) {
       setCurrentMap(targetMap)
       renderMap()
+    }
+
+    function getEntityByName(entityName) {
+      for (const entity of entities) {
+        if (entity.name === entityName) return entity
+      }
+    }
+
+    function moveEntityToPos(entityName, x, y) {
+      console.log("move it", entityName, x, y)
+      const entity = getEntityByName(entityName)
+      entity.x = x
+      entity.y = y
+      renderMap(false)
+    }
+
+    function moveEntityToMap(entityName, mapName) {
+      const entity = getEntityByName(entityName)
+      entity.mapName = mapName
+      renderMap(false)
     }
 
     function doSpecialCommand(command) {
@@ -549,6 +575,36 @@
         const words = command.split(" ").map(n => n.trim()).filter(n => n)
         targetMap = words[1]
         movePlayerToMap(targetMap)
+        return
+      }
+      if (command.startsWith("change ")) {
+        const words = command.split(" ").map(n => n.trim()).filter(n => n)
+        sourceTile = words[1]
+        targetTile = words[2]
+        changeTiles(sourceTile, targetTile)
+        renderMap(false)
+        return
+      }
+      if (command.startsWith("move_to_map ")) {
+        const words = command.split(" ").map(n => n.trim()).filter(n => n)
+        entityName = words[1]
+        targetMap = words[2]
+        moveEntityToMap(entityName, targetMap)
+        return
+      }
+      if (command.startsWith("move ")) {
+        const words = command.split(" ").map(n => n.trim()).filter(n => n)
+        entityName = words[1]
+        x = Number(words[2])
+        y = Number(words[3])
+        moveEntityToPos(entityName, x, y)
+        return
+      }
+      if (command.startsWith("move_player ")) {
+        const words = command.split(" ").map(n => n.trim()).filter(n => n)
+        x = Number(words[1])
+        y = Number(words[2])
+        movePlayerToPos(x, y)
         return
       }
       error(`Unknown special command $${command}`)
@@ -766,9 +822,8 @@
       ctx.fillRect(0, 0, 480, 320)
     }
 
-
-    function renderMap() {
-      hideTalkBox()
+    function renderMap(doHideTalkBox = true) {
+      if (doHideTalkBox) hideTalkBox()
       const map = getCurrentMap()
       const spaceX = 14
       const spaceY = 20
@@ -810,6 +865,7 @@
       let i = -1
       for (const entity of getAllEntitiesOnCurrentMap()) {
         i++
+        if (entity.name === "snitch") console.log(entity)
         if (player.x === entity.x && player.y === entity.y) return
         const distX = Math.abs(entity.x - player.x)
         const distY = Math.abs(entity.y - player.y)
@@ -828,6 +884,24 @@
 
     function isEnglishLowerCaseLetter(char) {
       return /^[a-z]$/.test(char)
+    }
+
+    function changeTiles(srcTile, destTile) {
+      loopThroughAllMaps((char, x, y, map, key) => {
+        if (map[y][x] === srcTile) {
+          map[y][x] = destTile
+        }
+      })
+    }
+
+    function loopThroughAllMaps(func) {
+      for (const key of Object.keys(authorData.maps)) {
+        if (key === "$firstMapName") continue
+        const map = authorData.maps[key]
+        loopThroughMap(map, (char, x, y) => {
+          func(char, x, y, map, key)
+        })
+      }
     }
 
     function adjustMap(map, mapName) {
