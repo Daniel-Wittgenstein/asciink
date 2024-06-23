@@ -299,6 +299,7 @@
       }
 
       document.addEventListener("keyup", (ev) => {
+        if (player.gameOver) return
         const k = ev.key
         let oldX = player.x
         let oldY = player.y
@@ -308,6 +309,7 @@
           takeTurn(num - 1)
           return
         }
+        if (player.blocked) return
         let walked = false
         if (k === "ArrowUp" || k === "w") {player.y --; walked = true}
         if (k === "ArrowDown" || k === "s") {player.y ++; walked = true}
@@ -518,11 +520,34 @@
       }
     }
 
+    function endGame() {
+      ctx.fillStyle = authorData.header.game.bg
+      ctx.fillRect(0, 0, 480, 320)
+      player.gameOver = true
+    }
+
+    function doSpecialCommand(command) {
+      if (command === "end") {
+        endGame()
+      }
+      if (command === "block") {
+        player.blocked = true
+      }
+      if (command === "unblock") {
+        player.blocked = false
+      }
+    }
+
     function doRunStory() {
       while (story.canContinue) {
         const content = story.Continue()
         console.log("text print", content)
-        print(content, "text")
+        if (content.trim().startsWith("$")) {
+          doSpecialCommand(content.replace("$", "").trim())
+        } else {
+          print(content, "text")
+        }
+        
       }
       if (story.currentChoices.length > 0) {
         for (let i = 0; i < story.currentChoices.length; i++) {
