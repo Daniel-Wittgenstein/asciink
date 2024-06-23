@@ -17,6 +17,10 @@ window.helpContents = `
       pre {
         border: 1px solid #ddd;
       }
+      
+      .mark {
+        color: #0d0;
+      }
 
     </style>
   </head>
@@ -117,7 +121,9 @@ window.helpContents = `
 
   The "." character is special. It signifies an empty space you can walk through.<br><br>
 
-  The "@" character is also special. It signifies the player starting location.<br><br>
+  The "@" character is also special. It signifies the player starting location.
+  The player always starts on the first map (the first or top-most map in the text file), so
+  the "@" should appear on the first map.<br><br>
 
   All <b>lower-case</b> Latin letters from a to z and the colon are also special. You can use them
   to put markers on the map. For example:
@@ -130,9 +136,11 @@ window.helpContents = `
   </pre>
 
   This puts a marker called "cat" right under the colon.
-  When the player walks on this marker, we go the Ink knot called "cat"
+  When the player steps on this marker, we go to the Ink knot called "cat"
   and display the text and choices defined there.
   So markers basically let you trigger dialogue.
+  Do not forget to end your knots with
+  "-> DONE" or you will get an Ink error.
   Refer to the <a href="https://github.com/inkle/ink/blob/master/Documentation/WritingWithInk.md">Ink</a>
   docs to learn more. It's a great scripting language!
 
@@ -181,17 +189,28 @@ window.helpContents = `
   You can trigger special commands from your Ink block by starting a line
   with a <b>$</b> symbol.<br><br>
 
-  $end: This ends the story. The map will become invisible, but the text box
+  <span class="mark">$end</span>: This ends the story. The map will become invisible, but the text box
   will still be shown, so you can display one last message to the player.
   In the demo game Aragog is an example of how to end the game.<br><br>
 
-  $block: This blocks player movement, forcing them to make a choice (or many choices).<br><br>
+  <span class="mark">$block</span>: This blocks player movement, forcing them to make a choice (or many choices).<br><br>
 
-  $unblock: This unblocks player movement, allowing them to walk again. Look at the demo
+  <span class="mark">$unblock</span>: This unblocks player movement, allowing them to walk again. Look at the demo
   game for an example of how $block and $unblock can be used: when the player enters
   the kitchen for the first time, they have to choose between two options. If you don't block,
   choices are optional and the player can just walk away from them.<br><br>
 
+  <span class="mark">$jump mapName</span>: You have to put the name of a map after this command. The command
+  moves the player to the map with the specified name.
+  If you are asking yourself what a map's name is, look at the second block, where you start
+  maps like this:
+  <pre>
+      MAP: my-map1
+  </pre>
+  <b>my-map1</b> would be the map's name you have to use for "jump" (not: "MAP" which is
+  just a keyword).<br><br>
+
+  <span class="mark">change</span>
   </body>
 </html>
 `
