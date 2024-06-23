@@ -334,7 +334,7 @@
           player.x = oldX
           player.y = oldY
         }
-        for (const entity of entities) {
+        for (const entity of getAllEntitiesOnCurrentMap()) {
           if (player.x === entity.x && player.y === entity.y) {
             renderMap()
             startTalk(entity)
@@ -462,6 +462,7 @@
         return
       }
       authorData = dataObj
+      setCurrentMap(authorData.maps.$firstMapName)
       story.onError = (err) => error(err, "story.onError")
       startStory()
     }
@@ -526,16 +527,31 @@
       player.gameOver = true
     }
 
+    function movePlayerToMap(targetMap) {
+      setCurrentMap(targetMap)
+      renderMap()
+    }
+
     function doSpecialCommand(command) {
       if (command === "end") {
         endGame()
+        return
       }
       if (command === "block") {
         player.blocked = true
+        return
       }
       if (command === "unblock") {
         player.blocked = false
+        return
       }
+      if (command.startsWith("jump ")) {
+        const words = command.split(" ").map(n => n.trim()).filter(n => n)
+        targetMap = words[1]
+        movePlayerToMap(targetMap)
+        return
+      }
+      error(`Unknown special command $${command}`)
     }
 
     function doRunStory() {
@@ -687,14 +703,14 @@
       for (const map of maps) {
         let map2 = map.trim()
         const [mapName, rest] = getFirstWordAndRest(map2)
-        mapsObj[mapName] = createMap(rest)
+        mapsObj[mapName] = createMap(rest, mapName)
         if (!firstMapName) firstMapName = mapName
       }
       mapsObj.$firstMapName = firstMapName
       return mapsObj
     }
 
-    function createMap(str) {
+    function createMap(str, mapName) {
       const lines = str.split("\n")
       let y = -1
       const grid = []
@@ -709,7 +725,7 @@
           grid[y][x] = char
         }
       }
-      adjustMap(grid)
+      adjustMap(grid, mapName)
       return grid
     }
 
@@ -723,8 +739,17 @@
       setTimeout(renderMap, time)
     }
 
+    function setCurrentMap(mapName) {
+      if (!authorData.maps[mapName]) {
+        error(`You tried to move the player to map "${mapName}" but that is a not map that exists.`)
+        console.log("wooooo")
+        return
+      }
+      player.currentMap = mapName
+    }
+
     function getCurrentMap() {
-      const map = authorData.maps[authorData.maps.$firstMapName]
+      const map = authorData.maps[player.currentMap]
       return map
     }
 
@@ -783,7 +808,7 @@
         ctx.fillText(showChar, px, py)
       })
       let i = -1
-      for (const entity of entities) {
+      for (const entity of getAllEntitiesOnCurrentMap()) {
         i++
         if (player.x === entity.x && player.y === entity.y) return
         const distX = Math.abs(entity.x - player.x)
@@ -797,11 +822,15 @@
       }
     }
 
+    function getAllEntitiesOnCurrentMap() {
+      return entities.filter(e => e.mapName === player.currentMap)
+    }
+
     function isEnglishLowerCaseLetter(char) {
       return /^[a-z]$/.test(char)
     }
 
-    function adjustMap(map) {
+    function adjustMap(map, mapName) {
       let collect = null
       loopThroughMap(map, (char, x, y) => {
         //console.log(char, x, y)
@@ -821,6 +850,7 @@
               xPos = x - 1
             }
             entities.push({
+              mapName,
               x: xPos,
               y,
               name: collect.replaceAll(":", ""),
