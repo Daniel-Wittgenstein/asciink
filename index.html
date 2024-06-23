@@ -792,6 +792,12 @@
             })
             collect = null
           }
+
+          if (char === "@") {
+            map[y][x] = "."
+            player.x = x
+            player.y = y
+          }
         }
       })
     }
