@@ -543,6 +543,16 @@
         if (entity.name === entityName) return entity
       }
     }
+    
+    function removeEntity(entityName) {
+      for (const entity of entities) {
+        if (entity.name === entityName) {
+          entity.mapName = "$non-map88238382"
+          entity.x = -10000
+          entity.y = -10000
+        }
+      }
+    }
 
     function moveEntityToPos(entityName, x, y) {
       const entity = getEntityByName(entityName)
@@ -589,6 +599,12 @@
         entityName = words[1]
         targetMap = words[2]
         moveEntityToMap(entityName, targetMap)
+        return
+      }
+      if (command.startsWith("remove ")) {
+        const words = command.split(" ").map(n => n.trim()).filter(n => n)
+        entityName = words[1]
+        removeEntity(entityName)
         return
       }
       if (command.startsWith("move ")) {
