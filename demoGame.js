@@ -48,7 +48,7 @@ MAP: map1
 #..................#..#..:dobby#.#...........#.#
 #...:hall.:hall....#..#........#.#...........#.#
 ####.#####.#########..#........#.#.............#
-#......@..............#kitchen:$.#.:out......#.#
+#......@..............$:kitchen#.#.:out......#.#
 #..################################.############
 #..#........#...................................
 #..#........#......~~~:squid..........♧.........
@@ -135,6 +135,11 @@ This is Hagrid's hut. But he does not seem to be at home.
 
 === aragog
 You met Aragog. He looks hungry.
+
+Looks like game over.
+
+$end
+
 -> DONE
 
 === dobby
@@ -160,6 +165,8 @@ Wow! Looks like you found a secret door to the kitchens. You have never been her
 
 {elves_done: -> DONE}
 
+$block
+
 * That's awesome!
 Yeah! Inferior elves. You despise them.
 ~ evilness++
@@ -172,7 +179,10 @@ Somebody should free these poor bastards.
 
 
 -
+$unblock
+
 ~ elves_done = 1
 
 -> DONE
+
 `

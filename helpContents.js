@@ -163,6 +163,22 @@ window.helpContents = `
     $: show: *, color: blue, pass: yes
   </pre>
 
+  <h2>Special Ink Commands</h2>
+
+  You can trigger special commands from your Ink block by starting a line
+  with a <b>$</b> symbol.<br><br>
+
+  $end: This ends the story. The map will become invisible, but the text box
+  will still be shown, so you can display one last message to the player.
+  In the demo game Aragog is an example of how to end the game.<br><br>
+
+  $block: This blocks player movement, forcing them to make a choice (or many choices).<br><br>
+
+  $unblock: This unblocks player movement, allowing them to walk again. Look at the demo
+  game for an example of how $block and $unblock can be used: when the player enters
+  the kitchen for the first time, they have to choose between two options. If you don't block,
+  choices are optional and the player can just walk away from them.<br><br>
+
   </body>
 </html>
 `
