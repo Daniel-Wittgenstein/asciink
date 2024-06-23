@@ -1,0 +1,4 @@
+
+window.demoGame = `
+  demo game
+`

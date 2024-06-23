@@ -179,6 +179,7 @@
   <script src="./ink/ink-full.js"></script>
   <script src="./auto-generated/exportHtmlData.js"></script>
   <script src="./helpContents.js"></script>
+  <script src="./demoGame.js"></script>
   <!--END_DEV-->
 
   <!--INJECT-->
@@ -362,9 +363,11 @@
         download(ht, "export.html")
       })
 
-      if (localStorage.getItem(autoSave)) {
-        if (EDITOR) {
+      if (EDITOR) {
+        if (localStorage.getItem(autoSave)) {
           codeMirror.setValue(localStorage.getItem(autoSave))
+        } else {
+          codeMirror.setValue(window.demoGame)
         }
       }
 

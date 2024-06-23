@@ -1,7 +1,6 @@
 
       to do:
       - load demo game when no localstorage
-
       - end game from ink
       - set player start position via tile
 
