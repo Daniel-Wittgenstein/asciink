@@ -571,7 +571,7 @@
         player.blocked = false
         return
       }
-      if (command.startsWith("jump ")) {
+      if (command.startsWith("move_player_to_map ")) {
         const words = command.split(" ").map(n => n.trim()).filter(n => n)
         targetMap = words[1]
         movePlayerToMap(targetMap)

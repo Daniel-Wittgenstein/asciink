@@ -200,7 +200,7 @@ window.helpContents = `
   the kitchen for the first time, they have to choose between two options. If you don't block,
   choices are optional and the player can just walk away from them.<br><br>
 
-  <span class="mark">$jump mapName</span>: You have to put the name of a map after this command. The command
+  <span class="mark">$move_player_to_map mapName</span>: You have to put the name of a map after this command. The command
   moves the player to the map with the specified name.
   If you are asking yourself what a map's name is, look at the second block, where you start
   maps like this:
@@ -210,7 +210,14 @@ window.helpContents = `
   <b>my-map1</b> would be the map's name you have to use for "jump" (not: "MAP" which is
   just a keyword).<br><br>
 
-  <span class="mark">change</span>
+  <span class="mark">$move_player x y</span>: moves the player to another position.
+
+  <span class="mark">$move_to_map markerName mapName</span>: moves a marker to another map.
+
+  <span class="mark">$move markerName x y</span>: moves a marker to another position.
+
+  <span class="mark">change old_tile new_tile</span>: changes all tiles with a character
+    to another character (on all maps) 
   </body>
 </html>
 `
