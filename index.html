@@ -545,7 +545,6 @@
     }
 
     function moveEntityToPos(entityName, x, y) {
-      console.log("move it", entityName, x, y)
       const entity = getEntityByName(entityName)
       entity.x = x
       entity.y = y
@@ -798,7 +797,6 @@
     function setCurrentMap(mapName) {
       if (!authorData.maps[mapName]) {
         error(`You tried to move the player to map "${mapName}" but that is a not map that exists.`)
-        console.log("wooooo")
         return
       }
       player.currentMap = mapName
@@ -865,7 +863,6 @@
       let i = -1
       for (const entity of getAllEntitiesOnCurrentMap()) {
         i++
-        if (entity.name === "snitch") console.log(entity)
         if (player.x === entity.x && player.y === entity.y) return
         const distX = Math.abs(entity.x - player.x)
         const distY = Math.abs(entity.y - player.y)
@@ -907,7 +904,6 @@
     function adjustMap(map, mapName) {
       let collect = null
       loopThroughMap(map, (char, x, y) => {
-        //console.log(char, x, y)
         if (isEnglishLowerCaseLetter(char) || char === ":") {
           if (!collect) {
             collect = char
