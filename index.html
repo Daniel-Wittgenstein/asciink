@@ -617,6 +617,9 @@
     function processHeader(obj, str) {
       const lines = str.split("\n").map(n => n.trim()).filter(n => n)
       for (const line of lines) {
+        if (line.startsWith("//")) {
+          continue
+        }
         let [key, rest] = getFirstWordAndRest(line)
         key = key.replace(":", "").trim()
         rest = rest.trim()

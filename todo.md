@@ -1,13 +1,10 @@
 
       to do:
-      - docs link or display
-
       - load demo game when no localstorage
 
       - end game from ink
       - set player start position via tile
 
-      - maybe: comments inside header block
       - maybe: show title at beginning
       - maybe: special ink commands:
         - switch map
