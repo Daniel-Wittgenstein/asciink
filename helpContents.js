@@ -210,14 +210,15 @@ window.helpContents = `
   <b>my-map1</b> would be the map's name you have to use for "jump" (not: "MAP" which is
   just a keyword).<br><br>
 
-  <span class="mark">$move_player x y</span>: moves the player to another position.
+  <span class="mark">$move_player x y</span>: moves the player to another position.<br><br>
 
-  <span class="mark">$move_to_map markerName mapName</span>: moves a marker to another map.
+  <span class="mark">$move_to_map markerName mapName</span>: moves a marker to another map.<br><br>
 
-  <span class="mark">$move markerName x y</span>: moves a marker to another position.
+  <span class="mark">$move markerName x y</span>: moves a marker to another position.<br><br>
 
   <span class="mark">change old_tile new_tile</span>: changes all tiles with a character
-    to another character (on all maps) 
+    to another character (on all maps)<br><br>
+    
   </body>
 </html>
 `
