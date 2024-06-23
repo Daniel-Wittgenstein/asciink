@@ -104,6 +104,8 @@ window.helpContents = `
 
   The "." character is special. It signifies an empty space you can walk through.<br><br>
 
+  The "@" character is also special. It signifies the player starting location.<br><br>
+
   All <b>lower-case</b> Latin letters from a to z and the colon are also special. You can use them
   to put markers on the map. For example:
 
@@ -114,14 +116,14 @@ window.helpContents = `
   .......
   </pre>
 
-  This puts a marker called "cat" right under the semicolon.
+  This puts a marker called "cat" right under the colon.
   When the player walks on this marker, we go the Ink knot called "cat"
   and display the text and choices defined there.
   So markers basically let you trigger dialogue.
   Refer to the <a href="https://github.com/inkle/ink/blob/master/Documentation/WritingWithInk.md">Ink</a>
   docs to learn more. It's a great scripting language!
 
-  You can also put the semicolon at the beginning to put the marker on the other side:
+  You can also put the colon at the beginning to put the marker on the other side:
 
   <pre>
   .......

@@ -10,7 +10,7 @@ game:       color: white, bg: black
 text:       color: white, bg: black
 choice:     color: darkturquoise
 border:     color: darkturquoise, padding: yes, border: yes
-player:     color: darkturquoise, show: @
+player:     color: darkturquoise, show: Д
 fog:        color: #333, show: █
 
 
@@ -48,7 +48,7 @@ MAP: map1
 #..................#..#..:dobby#.#...........#.#
 #...:hall.:hall....#..#........#.#...........#.#
 ####.#####.#########..#........#.#.............#
-#.....................#kitchen:$.#.:out......#.#
+#......@..............#kitchen:$.#.:out......#.#
 #..################################.############
 #..#........#...................................
 #..#........#......~~~:squid..........♧.........
