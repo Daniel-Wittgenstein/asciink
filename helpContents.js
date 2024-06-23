@@ -35,7 +35,7 @@ window.helpContents = `
     A very simple game demonstrating all three blocks:
   </div>
   <pre>
-    title:  title: Example Game
+    title:  title: Example Game, author: myself
     game:   color: aqua, bg: black
     fog:    show: no
 
@@ -69,7 +69,7 @@ window.helpContents = `
   <h2>Changing the colors and the look of your game</h2>
   In the first block you can have these generic properties: 
   <pre>
-    title:      title: My Funky Game
+    title:      title: My Funky Game, author: H. H. Funk
     game:       color: #fff, bg: blue
     text:       color: yellow, bg: red
     choice:     color: pink

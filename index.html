@@ -483,7 +483,8 @@
     function getDefaultSettings() {
       return {
         "title": {
-            "title": "Unnamed Game"
+            "title": "Unnamed Game",
+            "author": "Anonymous",
         },
         "game": {
             "color": "white",
@@ -521,8 +522,7 @@
     }
 
     function endGame() {
-      ctx.fillStyle = authorData.header.game.bg
-      ctx.fillRect(0, 0, 480, 320)
+      clearCanvas()
       player.gameOver = true
     }
 
@@ -715,7 +715,12 @@
 
     function startStory() {
       ctx = document.getElementById("map-canvas").getContext("2d")
-      renderMap()
+      clearCanvas()
+      const time = EDITOR ? 400 : 2000
+      print(authorData.header.title.title)
+      print(authorData.header.title.author)
+      showTalkBox()
+      setTimeout(renderMap, time)
     }
 
     function getCurrentMap() {
@@ -731,6 +736,12 @@
       document.getElementById("play").style.display = "none"
     }
 
+    function clearCanvas() {
+      ctx.fillStyle = authorData.header.game.bg
+      ctx.fillRect(0, 0, 480, 320)
+    }
+
+
     function renderMap() {
       hideTalkBox()
       const map = getCurrentMap()
@@ -740,8 +751,7 @@
       let ox = 240 - (player.x) * spaceX
       let oy = 160 - (player.y - 1) * spaceY
       ctx.font = '16px monospace';
-      ctx.fillStyle = authorData.header.game.bg
-      ctx.fillRect(0, 0, 480, 320)
+      clearCanvas()
       ctx.fillStyle = authorData.header.game.color
       loopThroughMap(map, (char, x, y) => {
         const distX = Math.abs(x - player.x)
