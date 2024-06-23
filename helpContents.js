@@ -212,13 +212,20 @@ window.helpContents = `
 
   <span class="mark">$move_player x y</span>: moves the player to another position.<br><br>
 
-  <span class="mark">$move_to_map markerName mapName</span>: moves a marker to another map.<br><br>
+  <span class="mark">$move_to_map marker_name map_name</span>: moves a marker to another map.<br><br>
 
-  <span class="mark">$move markerName x y</span>: moves a marker to another position.<br><br>
+  <span class="mark">$move marker_name x y</span>: moves a marker to another position.<br><br>
 
+  <span class="mark">remove marker_name</span>: remove an entity from the game.<br><br>
+  
   <span class="mark">change old_tile new_tile</span>: changes all tiles with a character
     to another character (on all maps)<br><br>
-    
+
+  Note: You can have multiple markers with the same name. $move_to_map and $move
+  will only affect the first marker with this name however. $remove will remove all markers
+  with this name.
+
+
   </body>
 </html>
 `
