@@ -699,8 +699,12 @@
           (self) => {
             self.duration = duration
             self.entity = getEntityByName(entityName)
+            self.entity.walkCounter = 0
           },
           (self) => {
+            self.entity.walkCounter++
+            if (self.entity.walkCounter < self.entity.delay) return
+            self.entity.walkCounter = 0
             if (self.entity.x !== player.x) {
               self.entity.x += Math.sign(player.x - self.entity.x)
               return 
