@@ -242,6 +242,7 @@
     
     let authorData = null
     let entities = []
+    let realTimeStopped = false
     let player = null
 
     const sequenceIntervalTime = 250
@@ -268,6 +269,7 @@
       if (sequenceInterval) {
         clearInterval(sequenceInterval)
       }
+      realTimeStopped = false
       entities = []
       sequences = {}
       authorData = null
@@ -345,13 +347,6 @@
         if (block) {
           player.x = oldX
           player.y = oldY
-        }
-        for (const entity of getAllEntitiesOnCurrentMap()) {
-          if (player.x === entity.x && player.y === entity.y) {
-            renderMap()
-            startTalk(entity)
-            return
-          }
         }
         if (oldX !== player.x || oldY !== player.y) {
           cls()
@@ -637,6 +632,7 @@
     }
 
     function doNextGlobalSequenceStep() {
+      if (realTimeStopped) return
       for (const key of Object.keys(sequences)) {
         const sequence = sequences[key]
         doUpdateStepForSequence(sequence)
@@ -646,7 +642,18 @@
           delete seq[key]
         }
       }
+      checkPlayerOnEntity()
       renderMap(false)
+    }
+
+    function checkPlayerOnEntity() {
+      for (const entity of getAllEntitiesOnCurrentMap()) {
+        if (player.x === entity.x && player.y === entity.y) {
+          renderMap()
+          startTalk(entity)
+          return
+        }
+      }
     }
 
     function getFuncsForDelayedCommand(command, params, paramsAsSingleString) {
@@ -1042,10 +1049,12 @@
     }
 
     function showTalkBox() {
+      realTimeStopped = true
       document.getElementById("play").style.display = "block"
     }
 
     function hideTalkBox() {
+      realTimeStopped = false
       document.getElementById("play").style.display = "none"
     }
 
