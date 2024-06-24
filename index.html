@@ -303,7 +303,10 @@
           },
         })
 
-        codeMirror.on("focus", function() { cleanEditor() })  
+        codeMirror.on("focus", function() {
+          cleanEditor()
+          endGame()
+        })  
 
       }
 
@@ -1042,7 +1045,7 @@
     }
 
     function clearCanvas() {
-      ctx.fillStyle = authorData.header.game.bg
+      ctx.fillStyle = authorData?.header?.game?.bg || "#000"
       ctx.fillRect(0, 0, 480, 320)
     }
 
