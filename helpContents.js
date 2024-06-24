@@ -126,7 +126,7 @@ window.helpContents = `
   the "@" should appear on the first map.<br><br>
 
   All <b>lower-case</b> Latin letters from a to z and the colon are also special. You can use them
-  to put markers on the map. For example:
+  to put entities on the map. For example:
 
   <pre>
   .......
@@ -135,16 +135,16 @@ window.helpContents = `
   .......
   </pre>
 
-  This puts a marker called "cat" right under the colon.
-  When the player steps on this marker, we go to the Ink knot called "cat"
+  This puts a entity called "cat" right under the colon.
+  When the player steps on this entity, we go to the Ink knot called "cat"
   and display the text and choices defined there.
-  So markers basically let you trigger dialogue.
+  So entities basically let you trigger dialogue.
   Do not forget to end your knots with
   "-> DONE" or you will get an Ink error.
   Refer to the <a href="https://github.com/inkle/ink/blob/master/Documentation/WritingWithInk.md">Ink</a>
   docs to learn more. It's a great scripting language!
 
-  You can also put the colon at the beginning to put the marker on the other side:
+  You can also put the colon at the beginning to put the entity on the other side:
 
   <pre>
   .......
@@ -153,15 +153,15 @@ window.helpContents = `
   .......
   </pre>
 
-  <h2>Customizing markers</h2>
+  <h2>Customizing entities</h2>
 
-  You can change the look of markers in the first block:
+  You can change the look of entities in the first block:
 
   <pre>
     giant: show: #, color: #f0f
   </pre>
 
-  And you can make invisible markers:
+  And you can make invisible entities:
 
   <pre>
     hall: show: no
@@ -212,18 +212,69 @@ window.helpContents = `
 
   <span class="mark">$move_player x y</span>: moves the player to another position.<br><br>
 
-  <span class="mark">$move_to_map marker_name map_name</span>: moves a marker to another map.<br><br>
+  <span class="mark">$move_to_map entity_name map_name</span>: moves a entity to another map.<br><br>
 
-  <span class="mark">$move marker_name x y</span>: moves a marker to another position.<br><br>
+  <span class="mark">$move entity_name x y</span>: moves a entity to another position.<br><br>
 
-  <span class="mark">remove marker_name</span>: remove an entity from the game.<br><br>
+  <span class="mark">$remove entity_name</span>: remove an entity from the game.<br><br>
   
-  <span class="mark">change old_tile new_tile</span>: changes all tiles with a character
-    to another character (on all maps)<br><br>
+  <span class="mark">$change old_tile new_tile</span>: changes all tiles with a character
+    to another character (on all maps)<br><br>  
 
-  Note: You can have multiple markers with the same name. $move_to_map and $move
-  will only affect the first marker with this name however. $remove will remove all markers
+  <span class="mark">$delay entity_name number</span>: sets the movement delay
+  of the entity (see sequences below). 1 is full speed, 2 is half as fast (roughly),
+  3 is a third of the speed etc.<br><br>
+
+  Note: You can have multiple entities with the same name. $move_to_map and $move
+  will only affect the first entity with this name however. $remove will remove all entities
   with this name.
+
+  <h2>Sequences</h2>
+
+  Sequences are sequences of commands that run in real-time.
+  The next command in the sequence triggers only when the former command has completed.
+
+  This sets the delay of entity "hermione" to 3 and let's her walk around in a circle:
+
+  <pre>
+    $delay hermione 3
+    $seq s1 loop walk hermione 4 4; walk hermione 10 9
+  </pre>
+
+  A sequence is defined like this:<br><br>
+
+  $seq a_sequence_name loop [first_instruction]; [second_instruction]; [third_instruction] etc. ...<br><br>
+
+  or like this (identical but without the "loop" keyword):<br><br>
+
+  $seq a_sequence_name [first_instruction]; [second_instruction]; [third_instruction] etc. ...<br><br>
+
+  The sequence_name has to be a single word and you can use any word you like.<br><br>
+
+  The instructions can be any of the commands mentioned above, but without
+  a leading $ symbol. They can also be special sequence commands that are
+  only allowed inside sequences (see below).<br><br>
+
+  Special sequence commands:<br><br>
+
+  <span class="mark">walk entity_name</span> destination_x destination_y<br>
+  The entity walks to the given location (moving through walls if any are in the way).
+  Once the entity reaches the location, the next step in the sequence is triggered.<br><br>
+
+  <span class="mark">wait</span> number<br>
+  The sequence waits for <number> time steps before proceeding to the next command in the sequence.
+  (Note that this does not block game play. All sequences run in parallel. It just
+  delays the beginning of the next step in the sequence.) <br><br>
+
+  <span class="mark">chase</span> entity_name duration<br>
+  The specified entity will start chasing the player. 
+  [duration] must be a number. It specifies how long (how many time units)
+  the entity should chase the player.
+  If the entity catches the player OR the duration time elapses, the
+  sequence moves on to the next step in the sequence.
+  You can also not specify a duration in which case the entity will never stop chasing
+  the player, but the next step in the sequence will also never be executed until
+  the player has been caught.<br><br>
 
 
   </body>

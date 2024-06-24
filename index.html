@@ -621,7 +621,6 @@
         sequence.currentCommandIndex++
         //check if sequence is completed and loop it or mark it as exhausted:
         if (sequence.currentCommandIndex >= sequence.commands.length) {
-          console.log("glab end seq", sequence.commands, currentCommand, sequence.currentCommandIndex)
           if (sequence.loop) {
             sequence.currentCommandIndex = 0
             for (const command of sequence.commands) {
