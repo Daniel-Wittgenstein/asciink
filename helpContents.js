@@ -225,6 +225,16 @@ window.helpContents = `
   of the entity (see sequences below). 1 is full speed, 2 is half as fast (roughly),
   3 is a third of the speed etc.<br><br>
 
+  <span class="mark">$exec_ink knot_name</span>: Goes to an Ink knot but does not
+  display any text. This command is only useful inside sequences (see below).
+  You can use it to set Ink variables inside a sequence. In the example game,
+  when Hermione reaches the library we execute an Ink knot to set a variable.
+  Then we use that variable when the player meets her again, so that
+  she says something else when she is waiting in front of the library. 
+  <br><br>
+
+  
+
   Note: You can have multiple entities with the same name. $move_to_map and $move
   will only affect the first entity with this name however. $remove will remove all entities
   with this name.

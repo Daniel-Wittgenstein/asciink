@@ -799,6 +799,14 @@
           movePlayerToMap(targetMap)
         }
       }
+      if (command.startsWith("exec_ink ")) {
+        return () => {
+          const words = command.split(" ").map(n => n.trim()).filter(n => n)
+          target = words[1]
+          story.ChoosePathString(target)
+          story.ContinueMaximally()
+        }
+      }
       if (command.startsWith("delay ")) {
         return () => {
           const words = command.split(" ").map(n => n.trim()).filter(n => n)
