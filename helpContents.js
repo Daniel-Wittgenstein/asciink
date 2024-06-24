@@ -231,8 +231,15 @@ window.helpContents = `
 
   <h2>Sequences</h2>
 
-  Sequences are sequences of commands that run in real-time.
-  The next command in the sequence triggers only when the former command has completed.
+  With sequences you can change stuff in real-time while the player is moving.<br><br>
+
+  When the player is talking however, all real-time effects stop, so
+  characters won't move as long as the text box with the Ink story
+  is displayed. As soon as the player moves again, the real-time effects
+  restart where they left off.<br><br>
+
+  Sequences consist of a list of commands that run in order.
+  The next command in the sequence triggers only when the previous command has completed.<br><br>
 
   This sets the delay of entity "hermione" to 3 and let's her walk around in a circle:
 
