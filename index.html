@@ -227,7 +227,7 @@
         codeMirror.addLineClass(realLineNr - 1, "wrap", "code-editor-error-line")
         codeMirror.scrollIntoView({line: realLineNr - 1, char: 1}, marginFromTop)
       }
-
+      resetGameState()
     }
 
     const autoSave = "buffy summers"
@@ -243,6 +243,11 @@
     let authorData = null
     let entities = []
     let player = null
+
+    const sequenceIntervalTime = 250
+
+    let sequenceInterval = null
+    let sequences = {}
 
     let ctx = null
 
@@ -260,7 +265,11 @@
     }
 
     function resetGameState() {
+      if (sequenceInterval) {
+        clearInterval(sequenceInterval)
+      }
       entities = []
+      sequences = {}
       authorData = null
       player = {x: 3, y: 3}
     }
@@ -444,6 +453,7 @@
       LINES_OFFSET = countLinesUntil(v, secIndex)
 
       resetGameState()
+      sequenceInterval = setInterval(doNextGlobalSequenceStep, sequenceIntervalTime)
 
       const [err, dataObj, inkCode] = preprocess(v)
 
@@ -456,7 +466,6 @@
         const compiler = new inkjs.Compiler(inkCode)
         compiler.OnError = (err) => {error(err, "compiler.OnError")}
         story = compiler.Compile()
-        console.log(compiler, story)
       } catch(err) {
         //error(err, "catch")
         return
@@ -524,6 +533,7 @@
 
     function endGame() {
       clearCanvas()
+      resetGameState()
       player.gameOver = true
     }
 
@@ -542,6 +552,7 @@
       for (const entity of entities) {
         if (entity.name === entityName) return entity
       }
+      error(`Entity with name ${entityName} does not exist.`)
     }
     
     function removeEntity(entityName) {
@@ -567,69 +578,265 @@
       renderMap(false)
     }
 
+    function doSequence(text) {
+      let loop = false
+      let [first, rest] = getFirstWordAndRest(text)
+      const sequenceName = first.trim()
+      rest = rest.trim()
+      const [second, rest2] = getFirstWordAndRest(rest)
+      let body
+      if (second === "loop") {
+        loop = true
+        body = rest2
+      } else {
+        loop = false
+        body = rest
+      }
+      const parts = body.split(";").map(n => n.trim()).filter(n => n)
+      const commands = parts.map((p) => createSequenceCommandFromTextInstruction(p))
+      sequences[sequenceName] = {
+        name: sequenceName,
+        commands,
+        loop,
+        currentCommandIndex: 0,
+        counter: 0,
+      }
+      //so that first command is executed immediately:
+      doUpdateStepForSequence(sequences[sequenceName])
+    }
+
+
+    function doUpdateStepForSequence(sequence) {
+      if (sequence.exhausted) return
+      const currentCommand = sequence.commands[sequence.currentCommandIndex]
+      //console.log("execing seq", sequence.name, sequence)
+      if (!currentCommand.hasBeenInitialized) {
+        currentCommand.hasBeenInitialized = true
+        currentCommand.initFunc(currentCommand)
+      } else {
+        currentCommand.tickFunc(currentCommand)
+      }
+      //check if command is completed:
+      if (currentCommand.completionFunc(currentCommand)) {
+        sequence.currentCommandIndex++
+        //check if sequence is completed and loop it or mark it as exhausted:
+        if (sequence.currentCommandIndex >= sequence.commands.length) {
+          console.log("glab end seq", sequence.commands, currentCommand, sequence.currentCommandIndex)
+          if (sequence.loop) {
+            sequence.currentCommandIndex = 0
+            for (const command of sequence.commands) {
+              command.hasBeenInitialized = false
+            }
+          } else {
+            sequence.exhausted = true
+          }
+        }
+      }      
+    }
+
+    function doNextGlobalSequenceStep() {
+      for (const key of Object.keys(sequences)) {
+        const sequence = sequences[key]
+        doUpdateStepForSequence(sequence)
+      }
+      for (const [key, seq] of Object.entries(sequences)) {
+        if (seq.exhausted) {
+          delete seq[key]
+        }
+      }
+      renderMap(false)
+    }
+
+    function getFuncsForDelayedCommand(command, params, paramsAsSingleString) {
+      if (command === "wait") {
+        let time = Number(params[0]) || 0
+        return [
+          (self) => {
+            self.counter = 0
+          },
+          (self) => {
+            self.counter++
+          },
+          (self) => {
+            return (self.counter >= time)
+          },
+        ]
+      }
+
+      if (command === "walk") {
+        const entityName = params[0]
+        const x = Number(params[1])
+        const y = Number(params[2])
+        return [
+          (self) => {
+            self.destX = x
+            self.destY = y
+            self.entity = getEntityByName(entityName)
+            self.entity.walkCounter = 0
+          },
+          (self) => {
+            self.entity.walkCounter++
+            if (self.entity.walkCounter < self.entity.delay) return
+            self.entity.walkCounter = 0
+            if (self.entity.x !== self.destX) {
+              self.entity.x += Math.sign(self.destX - self.entity.x)
+              return 
+            }
+            if (self.entity.y !== self.destY) {
+              self.entity.y += Math.sign(self.destY - self.entity.y)
+              return 
+            }
+          },
+          (self) => {
+            return (self.entity.x === self.destX && self.entity.y === self.destY)
+          },
+        ]
+      }
+
+      if (command === "chase") {
+        const entityName = params[0]
+        const duration = params[1] ? Number(params[1]) : Infinity
+        return [
+          (self) => {
+            self.duration = duration
+            self.entity = getEntityByName(entityName)
+          },
+          (self) => {
+            if (self.entity.x !== player.x) {
+              self.entity.x += Math.sign(player.x - self.entity.x)
+              return 
+            }
+            if (self.y !== player.y) {
+              self.entity.y += Math.sign(player.y - self.entity.y)
+              return
+            }
+          },
+          (self) => {
+            return (self.entity.x === player.x && self.entity.y === player.y)
+          },
+        ]
+      }
+
+
+    }
+
+    function createSequenceCommandFromTextInstruction(text) {
+      const immediaFunc = getExecuteFunctionForSpecialCommand(text)
+      let initFunc
+      let tickFunc
+      let completionFunc
+      if (immediaFunc) {
+        //immediately completed instant commands:
+        initFunc = immediaFunc
+        tickFunc = () => true
+        completionFunc = () => true
+      } else {
+        const [first, rest] = getFirstWordAndRest(text)
+        const words = rest.split(" ").map(n => n.trim()).filter(n => n)
+        ;[initFunc, tickFunc, completionFunc] = getFuncsForDelayedCommand(first, words, rest) 
+      }
+      return {
+        initFunc,
+        tickFunc,
+        completionFunc,
+      }
+    }
+
+    function changeEntityDelay(entityName, delay) {
+      const entity = getEntityByName(entityName)
+      entity.delay = delay
+    }
+
     function doSpecialCommand(command) {
+      const f = getExecuteFunctionForSpecialCommand(command)
+      if (!f) {
+        error(`Unknown special command $${command}`)
+      } else {
+        f()
+        renderMap(false)
+      }
+    }
+
+    function getExecuteFunctionForSpecialCommand(command) {
       if (command === "end") {
-        endGame()
-        return
+        return () => {
+          endGame()
+        }
       }
       if (command === "block") {
-        player.blocked = true
-        return
+        return () => {
+          player.blocked = true
+        }
       }
       if (command === "unblock") {
-        player.blocked = false
-        return
+        return () => {
+          player.blocked = false
+        }
       }
       if (command.startsWith("move_player_to_map ")) {
-        const words = command.split(" ").map(n => n.trim()).filter(n => n)
-        targetMap = words[1]
-        movePlayerToMap(targetMap)
-        return
+        return () => {
+          const words = command.split(" ").map(n => n.trim()).filter(n => n)
+          targetMap = words[1]
+          movePlayerToMap(targetMap)
+        }
+      }
+      if (command.startsWith("delay ")) {
+        return () => {
+          const words = command.split(" ").map(n => n.trim()).filter(n => n)
+          entityName = words[1]
+          let delay = Number(words[2])
+          changeEntityDelay(entityName, delay)
+        }
       }
       if (command.startsWith("change ")) {
-        const words = command.split(" ").map(n => n.trim()).filter(n => n)
-        sourceTile = words[1]
-        targetTile = words[2]
-        changeTiles(sourceTile, targetTile)
-        renderMap(false)
-        return
+        return () => {
+          const words = command.split(" ").map(n => n.trim()).filter(n => n)
+          sourceTile = words[1]
+          targetTile = words[2]
+          changeTiles(sourceTile, targetTile)
+        }
       }
       if (command.startsWith("move_to_map ")) {
-        const words = command.split(" ").map(n => n.trim()).filter(n => n)
-        entityName = words[1]
-        targetMap = words[2]
-        moveEntityToMap(entityName, targetMap)
-        return
+        return () => {
+          const words = command.split(" ").map(n => n.trim()).filter(n => n)
+          entityName = words[1]
+          targetMap = words[2]
+          moveEntityToMap(entityName, targetMap)
+        }
       }
       if (command.startsWith("remove ")) {
-        const words = command.split(" ").map(n => n.trim()).filter(n => n)
-        entityName = words[1]
-        removeEntity(entityName)
-        return
+        return () => {
+          const words = command.split(" ").map(n => n.trim()).filter(n => n)
+          entityName = words[1]
+          removeEntity(entityName)
+        }
       }
       if (command.startsWith("move ")) {
-        const words = command.split(" ").map(n => n.trim()).filter(n => n)
-        entityName = words[1]
-        x = Number(words[2])
-        y = Number(words[3])
-        moveEntityToPos(entityName, x, y)
-        return
+        return () => {
+          const words = command.split(" ").map(n => n.trim()).filter(n => n)
+          entityName = words[1]
+          x = Number(words[2])
+          y = Number(words[3])
+          moveEntityToPos(entityName, x, y)
+        }
       }
       if (command.startsWith("move_player ")) {
-        const words = command.split(" ").map(n => n.trim()).filter(n => n)
-        x = Number(words[1])
-        y = Number(words[2])
-        movePlayerToPos(x, y)
-        return
+        return () => {
+          const words = command.split(" ").map(n => n.trim()).filter(n => n)
+          x = Number(words[1])
+          y = Number(words[2])
+          movePlayerToPos(x, y)
+        }
       }
-      error(`Unknown special command $${command}`)
+      return null
     }
 
     function doRunStory() {
       while (story.canContinue) {
         const content = story.Continue()
-        console.log("text print", content)
-        if (content.trim().startsWith("$")) {
+        if (content.trim().startsWith("$seq ")) {
+          doSequence(content.replace("$seq", "").trim())
+        } else if (content.trim().startsWith("$")) {
           doSpecialCommand(content.replace("$", "").trim())
         } else {
           print(content, "text")
@@ -639,7 +846,6 @@
       if (story.currentChoices.length > 0) {
         for (let i = 0; i < story.currentChoices.length; i++) {
           const choice = story.currentChoices[i]
-          console.log("choice print", choice.text)
           print((i + 1) + ". " + choice.text, "choice")
         }
       }
