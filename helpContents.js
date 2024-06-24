@@ -135,7 +135,7 @@ window.helpContents = `
   .......
   </pre>
 
-  This puts a entity called "cat" right under the colon.
+  This puts an entity called "cat" right under the colon.
   When the player steps on this entity, we go to the Ink knot called "cat"
   and display the text and choices defined there.
   So entities basically let you trigger dialogue.
@@ -212,9 +212,9 @@ window.helpContents = `
 
   <span class="mark">$move_player x y</span>: moves the player to another position.<br><br>
 
-  <span class="mark">$move_to_map entity_name map_name</span>: moves a entity to another map.<br><br>
+  <span class="mark">$move_to_map entity_name map_name</span>: moves an entity to another map.<br><br>
 
-  <span class="mark">$move entity_name x y</span>: moves a entity to another position.<br><br>
+  <span class="mark">$move entity_name x y</span>: moves an entity to another position.<br><br>
 
   <span class="mark">$remove entity_name</span>: remove an entity from the game.<br><br>
   
@@ -251,7 +251,7 @@ window.helpContents = `
   Sequences consist of a list of commands that run in order.
   The next command in the sequence triggers only when the previous command has completed.<br><br>
 
-  This sets the delay of entity "hermione" to 3 and let's her walk around in a circle:
+  This sets the delay of entity "hermione" to 3 and lets her walk around in a circle:
 
   <pre>
     $delay hermione 3
