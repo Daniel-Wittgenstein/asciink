@@ -703,8 +703,10 @@
             self.duration = duration
             self.entity = getEntityByName(entityName)
             self.entity.walkCounter = 0
+            self.durationCounter = 0
           },
           (self) => {
+            self.durationCounter++
             self.entity.walkCounter++
             if (self.entity.walkCounter < self.entity.delay) return
             self.entity.walkCounter = 0
@@ -718,6 +720,9 @@
             }
           },
           (self) => {
+            if (self.durationCounter > self.duration) {
+              return true
+            }
             return (self.entity.x === player.x && self.entity.y === player.y)
           },
         ]
