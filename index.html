@@ -1067,6 +1067,7 @@
     }
 
     function clearCanvas() {
+      if (!ctx) return
       ctx.fillStyle = authorData?.header?.game?.bg || "#000"
       ctx.fillRect(0, 0, 480, 320)
     }
