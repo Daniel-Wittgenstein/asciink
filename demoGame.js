@@ -1,5 +1,6 @@
 
 window.demoGame = `
+
 // WELCOME TO THE ASCIINK DEMO GAME!
 // HIT PLAY TO PLAY IT!
 // OR START CHANGING STUFF! :)
@@ -7,11 +8,11 @@ window.demoGame = `
 // Basic colors and setup:
 title:      title: Hogwarts - The Asciink Demo Game, author: Asciink
 game:       color: white, bg: black
-text:       color: white, bg: black
+text:       color: #0f0, bg: blue
 choice:     color: darkturquoise
 border:     color: darkturquoise, padding: yes, border: yes
 player:     color: darkturquoise, show: Д
-fog:        color: #333, show: █
+fog:        color: #fff, show: █
 
 
 // Display # as a cool unicode block that looks like a wall:
@@ -31,6 +32,7 @@ lock: show: no
 open: show: no
 a: show: 𓊍, color: white
 b: show: 𓊍, color: white
+s: show: no
 
 //snitch:
 snitch: show: •, color: yellow
@@ -53,7 +55,7 @@ winky: show: o, color: magenta
 squid: show: @, color: lime
 aragog: show: *, color: red
 hagrid: show: +, color: tomato
-
+hermione: show: H, color: #0f0
 
 
 @NEXT-BLOCK@
@@ -67,10 +69,10 @@ MAP: map1
 #..................#..#..:dobby#.#...........#.#
 #...:hall.:hall....#..#........#.#...........#.#
 ####.#####.#########..#........#.#.............#
-#......@..............$:kitchen#.#.:out......#.#
+#.........:hermione...$:kitchen#.#.:out......#.#
 #..################################.############
-#..#........#...................................
-#..#........#......~~~:squid..........♧.........
+#.s:@#......#...................................
+#..###......#......~~~:squid..........♧.........
 #..#...open:#....~~~~~~~.......♧................
 #..########_#......~~~~............♣...♣♣.♣♣..♣..
 #......lock:#....~~~~~.......♣.......♧♣..♣..♣...
@@ -146,6 +148,87 @@ VAR evilness = 0
 VAR elves_done = 0
 VAR elves_attitude = "neutral"
 VAR saved_squid = 0
+
+VAR insulted_hermione = 0
+VAR talked_to_hermione = 0
+VAR hermione_arrived = 0
+
+=== s
+//Here we setup the movement sequences for the characters.
+
+Welcome to Hogwarts!
+
+$delay hermione 4
+$seq s1 walk hermione 4 4; wait 2; walk hermione 1 2; wait 4; move_to_map hermione upstairs; move hermione 1 2; walk hermione 1 6; walk hermione 8 6; exec_ink hermione_arrives
+
+-> DONE
+
+=== hermione_arrives
+~ hermione_arrived = 1
+-> DONE
+
+
+
+=== herm_lib_closed
+Hermione: It looks like the library is closed.
+
++ Weird.
+
+  Yes. I hope the librarian shows up soon. I will wait here.
+
++ Have you seen the librarian?
+
+  No. But she should show up soon. I will wait here.
+
+-
+-> DONE
+
+=== hermione
+
+{hermione_arrived and not insulted_hermione:
+	-> herm_lib_closed
+}
+
+{insulted_hermione:
+	Hermione: {I won't talk to you. You are not a nice person.| Leave me alone!}
+	-> DONE
+}
+
+{talked_to_hermione:
+	Hermione: I need to hurry now!
+  -> DONE
+}
+
+Hermione: Hi! I am headed to the library. Do you want me to bring you a book later?
+
++ Yeah, I need "History of Hogwarts".
+	Okay, I'll bring it to you later!
+  Thanks!
+  Bye!
+  ~ talked_to_hermione = 1
+
++ I really need you to bring me "The Tome of Dark Magick".
+	But ... that's in the forbidden section. I can't do that.
+  
+  ++ Do it or we aren't friends anymore!
+  	What?!
+    She runs away crying.
+    ~ insulted_hermione = 1
+    
+  ++ Fair enough.
+  	Have a good read!
+    Bye!
+    ~ talked_to_hermione = 1
+
++ Get lost, stupid nerd!
+	Wow, so rude!
+  ~ insulted_hermione = 1
+  
+-
+
+-> DONE
+
+
 
 
 === end
@@ -319,4 +402,5 @@ $unblock
 ~ elves_done = 1
 
 -> DONE
+
 `
