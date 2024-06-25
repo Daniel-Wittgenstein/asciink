@@ -266,6 +266,12 @@
       playIt()      
     }
 
+    function doesTileBlockMovement(char) {
+      return (!authorData.header[char] ||
+            !authorData.header[char].pass ||
+            authorData.header[char].pass !== "yes")
+    }
+
     function resetGameState() {
       if (sequenceInterval) {
         clearInterval(sequenceInterval)
@@ -340,8 +346,7 @@
           block = true
         } else {
           char = map[player.y][player.x]
-          if (!authorData.header[char] ||
-            !authorData.header[char].pass || authorData.header[char].pass !== "yes") {
+          if (doesTileBlockMovement(char)) {
               block = true
           }
         }
@@ -673,6 +678,57 @@
       }
 
       if (command === "walk") {
+        const entityName = params[0]
+        const x = Number(params[1])
+        const y = Number(params[2])
+        const failSequenceName = Number(params[3])
+        return [
+          (self) => {
+            self.entity = getEntityByName(entityName)
+            const startX = self.entity.x
+            const startY = self.entity.y
+            self.entity.destX = x
+            self.entity.destY = y
+            self.entity.walkCounter = 0
+            self.pathCompleted = false
+            self.entity.path = null
+            const passFunc = (char) => {
+              return authorData.header[char]?.pass === "yes"
+            }
+            function completedFunc(path) {
+              if (path === null) {
+                //no path found
+                //todo: start fail sequence
+              } else {
+                self.entity.path = path
+                self.entity.pathPointer = 0
+              }
+            }
+            const map = authorData.maps[self.entity.mapName]
+            findPath(map, passFunc, completedFunc, startX, startY, self.entity.destX, self.entity.destY)
+          },
+          (self) => {
+            if (!self.entity.path) return
+            if (self.pathCompleted) return
+            self.entity.walkCounter++
+            if (self.entity.walkCounter < self.entity.delay) return
+            self.entity.walkCounter = 0
+            const nextStep = self.entity.path[self.entity.pathPointer]
+            if (!nextStep) {
+              self.pathCompleted = true
+              return
+            }
+            self.entity.x = nextStep.x
+            self.entity.y = nextStep.y
+            self.entity.pathPointer++
+          },
+          (self) => {
+            return self.pathCompleted
+          },
+        ]
+      }
+
+      if (command === "primitive_walk") {
         const entityName = params[0]
         const x = Number(params[1])
         const y = Number(params[2])
@@ -1210,6 +1266,44 @@
     function print(text, cssClass) {
       outputDiv.innerHTML += `<div class="${cssClass}">${text}</div>`
     }
+
+    function findPath(map, passFunc, completedFunc, startX, startY, destX, destY) {
+      function charToNumeric(char) {
+        return char.charCodeAt(0)
+      }
+      function getNumericMap(map) {
+        const nuMap = [[]]
+        for (let x = 0; x <= mapWidth; x++) {
+          nuMap[0][x] = -1 //to keep easystar happy?
+        }
+        for (let y = 1; y < mapHeight; y++) {
+          nuMap[y] = []
+          for (let x = 0; x < mapWidth; x++) {
+            nuMap[y][x] = charToNumeric(map[y][x])
+          }
+        }
+        return nuMap
+      }
+      function getAcceptableTiles() {
+        const acceptableTiles = []
+        for (const key of Object.keys(authorData.header)) {
+          if (key.length > 1) continue
+          const char = key
+          if (passFunc(char)) {
+            acceptableTiles.push(charToNumeric(char))
+          }
+        }
+        return acceptableTiles
+      }
+      const easystar = new EasyStar.js()
+      const numericMap = getNumericMap(map)
+      easystar.setGrid(numericMap)
+      const acceptableTiles = getAcceptableTiles()
+      easystar.setAcceptableTiles(acceptableTiles)
+      easystar.findPath(startX, startY, destX, destY, completedFunc)
+      easystar.calculate()
+    }
+ 
 
   </script>
   </body>
