@@ -1145,7 +1145,9 @@
 
     function loopThroughAllMaps(func) {
       for (const key of Object.keys(authorData.maps)) {
-        if (key === "$firstMapName") continue
+        if (key === "$firstMapName") continue //special property.
+          //it lives on the map object, but is not a map itself,
+          //so we do not consider it here
         const map = authorData.maps[key]
         loopThroughMap(map, (char, x, y) => {
           func(char, x, y, map, key)
