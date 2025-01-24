@@ -163,7 +163,8 @@
       #map-canvas-overlay {
         width: 480px;
         height: 320px;
-        background: #000c;
+        background: var(--overlay-bg);
+        opacity: 0.8;
         position: absolute;
         display: flex;
       }
@@ -1035,6 +1036,10 @@
 
       if (headerKey === "text" && key === "bg") {
         setCssVar("bg", value)
+      }
+
+      if (headerKey === "game" && key === "bg") {
+        setCssVar("overlay-bg", value)
       }
 
       if (headerKey === "border" && key === "color") {
