@@ -130,6 +130,7 @@
         width: 480px;
         height: 320px;
         border: 0px solid #888;
+        display: flex;
       }
 
       textarea {
@@ -159,6 +160,14 @@
         color: blue;
       }
 
+      #map-canvas-overlay {
+        width: 480px;
+        height: 320px;
+        background: #000c;
+        position: absolute;
+        display: flex;
+      }
+
     </style>
   </head>
   <body>
@@ -168,6 +177,8 @@
           <div id="story"></div>
         </div>
         <div class="right">
+          <div id="map-canvas-overlay"></div>
+          <canvas id="map-canvas" width="480" height="320"></canvas>
           <div id="error-div"></div>
           <div id="play">
             <div id="play-inner">
@@ -175,7 +186,6 @@
               </div>              
             </div>              
           </div>
-          <canvas id="map-canvas" width="480" height="320"></canvas>
         </div>
       </div>
       <div class="bottom-bar bar">
@@ -273,6 +283,7 @@
     }
 
     function resetGameState() {
+      removeBlockModeFromDom()
       if (sequenceInterval) {
         clearInterval(sequenceInterval)
       }
@@ -846,11 +857,13 @@
       if (command === "block") {
         return () => {
           player.blocked = true
+          applyBlockModeToDom()
         }
       }
       if (command === "unblock") {
         return () => {
           player.blocked = false
+          removeBlockModeFromDom()
         }
       }
       if (command.startsWith("move_player_to_map ")) {
@@ -917,6 +930,14 @@
         }
       }
       return null
+    }
+
+    function applyBlockModeToDom() {
+      document.getElementById("map-canvas-overlay").style.display = "flex"
+    }
+
+    function removeBlockModeFromDom() {
+      document.getElementById("map-canvas-overlay").style.display = "none"
     }
 
     function doRunStory() {
