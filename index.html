@@ -427,14 +427,12 @@
     }
 
     function doAction(actionNr) {
-      //xyzzy
       const val = authorData.header.buttons[String(actionNr)]
       if (!val) {
         console.log("Button number " + actionNr + " is not used by this game.")
         return
       }
-      story.ChoosePathString(val)
-      story.ContinueMaximally()
+      gotoKnot(val)
     }
 
     function saveProject() {
@@ -986,13 +984,19 @@
 
     function startTalk(entity) {
       showTalkBox()
+      gotoKnot(entity.name)
+    }
+
+    function gotoKnot(target) {
       try {
-        story.ChoosePathString(entity.name)
+        story.ChoosePathString(target)
       } catch {
-        error (`No Ink knot with name "${entity.name}"?`)
+        error (`No Ink knot with name "${target}"?`)
       }
       doRunStory()
     }
+
+    
 
     const getFirstWord = (str) => {
       /* only looks at whitespace.
