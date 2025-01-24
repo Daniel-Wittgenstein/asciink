@@ -591,7 +591,7 @@
 
     function movePlayerToMap(targetMap) {
       setCurrentMap(targetMap)
-      renderMap()
+      renderMap(false)
     }
 
     function getEntityByName(entityName) {
@@ -890,6 +890,11 @@
         return () => {
           player.blocked = false
           removeBlockModeFromDom()
+        }
+      }
+      if (command.startsWith("hide_text")) {
+        return () => {
+          hideTalkBox()
         }
       }
       if (command.startsWith("move_player_to_map ")) {

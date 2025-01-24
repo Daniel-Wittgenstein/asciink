@@ -218,6 +218,8 @@ window.helpContents = `
 
   <span class="mark">$remove entity_name</span>: remove an entity from the game.<br><br>
   
+  <span class="mark">$hide_text</span>: temporarily hide the text box. (It will reappear when it is needed.)<br><br>
+  
   <span class="mark">$change old_tile new_tile</span>: changes all tiles with a character
     to another character (on all maps)<br><br>  
 
