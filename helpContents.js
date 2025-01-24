@@ -316,7 +316,7 @@ window.helpContents = `
       ~ counter += 1
   </pre>
 
-  This would make it so that the primary button teleports the player to another map and the secondary button increases a counter. You can use if conditions inside Ink to create all kind of complex behavior when a button is pressed.
+  This would make it so that the primary button teleports the player to another map and the secondary button increases a counter. You can use if conditions inside Ink to create all kinds of complex behaviors when a button is pressed.
 
 
   </body>
