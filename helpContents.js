@@ -275,8 +275,12 @@ window.helpContents = `
   Special sequence commands:<br><br>
 
   <span class="mark">walk entity_name</span> destination_x destination_y<br>
-  The entity walks to the given location (moving through walls if any are in the way).
-  Once the entity reaches the location, the next step in the sequence is triggered.<br><br>
+  The entity walks to the given location in a smart way. Smart means
+  that the entity will use pathfinding to find a path through the map
+  and will not walk through walls. Once the entity reaches the location, the next step in the sequence is triggered.<br><br>
+
+  <span class="mark">primitive_walk entity_name</span> destination_x destination_y<br>
+  This is like walk, but without path-finding. You can use this if you are sure that there are no walls between the starting point and the end point anyway, or if you WANT the entity to walk through walls.
 
   <span class="mark">wait</span> number<br>
   The sequence waits for <number> time steps before proceeding to the next command in the sequence.
