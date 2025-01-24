@@ -225,14 +225,6 @@ window.helpContents = `
   of the entity (see sequences below). 1 is full speed, 2 is half as fast (roughly),
   3 is a third of the speed etc.<br><br>
 
-  <span class="mark">$exec_ink knot_name</span>: Goes to an Ink knot but does not
-  display any text. This command is only useful inside sequences (see below).
-  You can use it to set Ink variables inside a sequence. In the example game,
-  when Hermione reaches the library we execute an Ink knot to set a variable.
-  Then we use that variable when the player meets her again, so that
-  she says something else when she is waiting in front of the library. 
-  <br><br>
-
   
 
   Note: You can have multiple entities with the same name. $move_to_map and $move
@@ -280,7 +272,7 @@ window.helpContents = `
   and will not walk through walls. Once the entity reaches the location, the next step in the sequence is triggered.<br><br>
 
   <span class="mark">primitive_walk entity_name</span> destination_x destination_y<br>
-  This is like walk, but without path-finding. You can use this if you are sure that there are no walls between the starting point and the end point anyway, or if you WANT the entity to walk through walls.
+  This is like walk, but without path-finding. You can use this if you are sure that there are no walls between the starting point and the end point anyway, or if you WANT the entity to walk through walls.<br><br>
 
   <span class="mark">wait</span> number<br>
   The sequence waits for <number> time steps before proceeding to the next command in the sequence.
@@ -296,6 +288,9 @@ window.helpContents = `
   You can also not specify a duration in which case the entity will never stop chasing
   the player, but the next step in the sequence will also never be executed until
   the player has been caught.<br><br>
+
+    <span class="mark">exec_ink knot_name</span>: Goes to an Ink knot but does not display any text (and does not run any special commands inside the Ink knot either). You use this to set Ink variables inside a sequence. In the example game, when Hermione reaches the library we execute an Ink knot to set a variable. Then we use that variable when the player meets her again, so that she says something else when she is waiting in front of the library. 
+  <br><br>
 
 
   </body>

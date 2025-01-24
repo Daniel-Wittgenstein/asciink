@@ -334,6 +334,14 @@
       document.addEventListener("keyup", (ev) => {
         if (player.gameOver) return
         const k = ev.key
+        if (k === " ") {
+          doAction(1)
+          return
+        }
+        if (k === "Enter") {
+          doAction(2)
+          return
+        }
         if (k === "1" || k === "2" || k === "3" || k === "4" || k === "5" || k === "6" ||
             k === "7" || k === "8" || k === "9") {
           const num = Number(k)
@@ -416,6 +424,17 @@
       }
 
       if (!EDITOR) startExportedGame()
+    }
+
+    function doAction(actionNr) {
+      //xyzzy
+      const val = authorData.header.buttons[String(actionNr)]
+      if (!val) {
+        console.log("Button number " + actionNr + " is not used by this game.")
+        return
+      }
+      story.ChoosePathString(val)
+      story.ContinueMaximally()
     }
 
     function saveProject() {
@@ -540,6 +559,10 @@
         "fog": {
             "color": "#444",
             "show": "█"
+        },
+        "buttons": {
+            "1": "",
+            "2": "",
         },
         ".": {
             "show": " ",
