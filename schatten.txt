@@ -1,0 +1,159 @@
+
+
+// Basic colors and setup:
+title:      title: Schattenwelt, author: Me
+game:       color: white, bg: black
+text:       color: #fff, bg: black
+choice:     color: #fff
+border:     color: darkturquoise, padding: yes, border: yes
+player:			color: #0cc, show: A
+fog:        color: #101018, show: █
+buttons:		1: button1
+
+
+
+ha: color: #0c0, show: H
+to: color: #ccc, show: T
+
+#: show: █, color: #777
+`: show: █, color: #060
+1: show: no, knot: gasse, pass: yes
+2: show: no, knot: abhauen, pass: yes
+s: show: o, pass:yes, color: #0c0
+
+// And we will use $ to create fake walls. They look like walls but you can walk through them:
+$: show: █, pass: yes
+
+harry: color: #0c0, show: H
+
+
+@NEXT-BLOCK@
+
+MAP: map1
+################################################
+#.................###...........to:#...........#
+#..................................#...........#
+#.......1111................########...........#
+#.......@111................#..................#
+#........111................#..................#
+#........####################..................#
+#...:ha..#.....................................#
+#........#.....................................#
+#22222222#.....................................#
+#========#######################################
+#..............................................#
+#..............................................#
+#..............................................#
+#..==....==....==....==....==....==....==....==#
+#..............................................#
+#..............................................#
+#..............................................#
+#==============================================#
+#..............................................#
+#..............................................#
+#..............................................#
+#..............................................#
+################################################
+
+MAP: map2
+################################################
+#.................###..........s:..#...........#
+#............s:............s:......#...........#
+#......s:...................########...........#
+#.s:.............s:.........#..................#
+#...........................#..................#
+#........####################..................#
+#...s:...#.....................................#
+#........#.....................................#
+#........#.....................................#
+################################################
+#..............................................#
+#..............................................#
+#..............................................#
+#..==....==....==....==....==....==....==....==#
+#..............................................#
+#..............................................#
+#..............................................#
+#==============================================#
+#..............................................#
+#..............................................#
+#..............................................#
+#..............................................#
+################################################
+
+
+
+@NEXT-BLOCK@
+
+VAR map = "1"
+
+
+=== s
+Schleim.
+-> DONE
+
+=== function hide_text
+	$hide_text
+
+=== button1
+
+{map:
+  
+  - "1":
+			$move_player_to_map map2
+			$change \# `
+      ~ map = "2"
+      {Alles verschwimmt. Dann bist du auf der anderen Seite.|Du springst wieder in die Schattenwelt.|Du springst wieder in die Schattenwelt.|Du springst wieder in die Schattenwelt.|Du springst wieder in die Schattenwelt.|{hide_text()}}
+      
+  
+  - "2":
+			$move_player_to_map map1
+			$change ` \#
+      ~ map = "1"
+      {Du springst zurück in deine Welt.|Du springst zurück in deine Welt.|Du springst zurück in deine Welt.|Du springst zurück in deine Welt.|Du springst zurück in deine Welt.|{hide_text()}}
+}
+-> DONE
+
+
+=== gasse
+Eine Hintergasse, in der es nach Fisch stinkt. Sollen wir die Sache schnell hinter uns bringen?
+-> DONE
+
+
+=== to
+Die Gasse endet vor einer Mülltonne. Okay. Hier geht es offensichlich nicht weiter. Zeit, das zu tun, was nur du kannst. [DRÜCKE DIE LEERTASTE]
+
+-> DONE
+
+
+-> DONE
+
+=== abhauen
+Am Liebsten würdest du wieder nach Hause gehen, ja. Aber leider geht das nicht. Noel würde dich umbringen. Und das ist nicht nur eine Redewendung.
+-> DONE
+
+=== harry_nochmal
+
+{"Hör auf, mich so behindert anzuglotzen und geh da rein und hol den Scheißkoffer, Mann", sagt Harry, freundlich wie immer.|Harry mustert dich feindselig.}
+-> DONE
+
+=== ha
+
+{Harry zieht an seiner Zigarette: "Was glotzt denn so? Ich dachte, du wärst längst fertig."|->harry_nochmal}
+
+$block
+
++ "Nur Geduld!"
+
+	"Was heißt hier GEDULD? Ich dachte, du hast diesen Koffer längst geholt. Mach mal!"
+  
++ "Fertig WOMIT?"
+
+  "Alter, bist du behindert? Noel hat gesagt, du kannst da reinspazieren und mit dem Koffer wieder raus. Also mach mal!"
+
+-
+
+$unblock
+
+-> DONE
+
