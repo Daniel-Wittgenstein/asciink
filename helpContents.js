@@ -200,8 +200,6 @@ window.helpContents = `
   the kitchen for the first time, they have to choose between two options. If you don't block,
   choices are optional and the player can just walk away from them.<br><br>
   
-  <span class="mark">$hide_text</span>: temporarily hide the text box. (It will reappear when it is needed.)<br><br>
-  
   <span class="mark">$move_player_to_map mapName</span>: You have to put the name of a map after this command. The command
   moves the player to the map with the specified name.
   If you are asking yourself what a map's name is, look at the second block, where you start
@@ -210,9 +208,7 @@ window.helpContents = `
       MAP: my-map1
   </pre>
   <b>my-map1</b> would be the map's name you have to use for "jump" (not: "MAP" which is
-  just a keyword).<br><br>
-  
-  Important: you may want to use this in conjunction with $hide_text or not, depending on whether you want to display something or not.
+  just a keyword).
   
   <br><br>
 
@@ -229,13 +225,19 @@ window.helpContents = `
 
   <span class="mark">$delay entity_name number</span>: sets the movement delay
   of the entity (see sequences below). 1 is full speed, 2 is half as fast (roughly),
-  3 is a third of the speed etc.<br><br>
-
-  
+  3 is a third of the speed etc.<br><br>  
 
   Note: You can have multiple entities with the same name. $move_to_map and $move
   will only affect the first entity with this name however. $remove will remove all entities
   with this name.
+
+  <br><br>
+
+  <span class="mark">$hide_text</span>: force the text box to temporarily hide. (It will reappear when it is needed.)<br><br>
+
+  Hint: if an Ink knot does not print anything, the text box is automatically not shown.
+
+  <br><br>
 
   <h2>Sequences</h2>
 

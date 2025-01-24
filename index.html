@@ -972,6 +972,7 @@
     }
 
     function doRunStory() {
+      let printed = false
       while (story.canContinue) {
         const content = story.Continue()
         if (content.trim().startsWith("$seq ")) {
@@ -980,16 +981,24 @@
           doSpecialCommand(content.replace("$", "").trim())
         } else {
           print(content, "text")
+          if (content.trim() !== "") printed = true
         }
-        
       }
+      // ######################
       if (story.currentChoices.length > 0) {
         for (let i = 0; i < story.currentChoices.length; i++) {
           const choice = story.currentChoices[i]
           print((i + 1) + ". " + choice.text, "choice")
+          printed = true
         }
       }
+      // ######################
+      if (!printed) {
+        hideTalkBox()
+      }
     }
+
+    
 
     function startTalk(entity) {
       showTalkBox()
@@ -1331,6 +1340,7 @@
     }
 
     function print(text, cssClass) {
+      if (text.trim() === "") return
       outputDiv.innerHTML += `<div class="${cssClass}">${text}</div>`
     }
 
