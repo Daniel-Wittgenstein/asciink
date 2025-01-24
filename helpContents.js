@@ -289,8 +289,34 @@ window.helpContents = `
   the player, but the next step in the sequence will also never be executed until
   the player has been caught.<br><br>
 
-    <span class="mark">exec_ink knot_name</span>: Goes to an Ink knot but does not display any text (and does not run any special commands inside the Ink knot either). You use this to set Ink variables inside a sequence. In the example game, when Hermione reaches the library we execute an Ink knot to set a variable. Then we use that variable when the player meets her again, so that she says something else when she is waiting in front of the library. 
+  <span class="mark">exec_ink knot_name</span>: Goes to an Ink knot but does not display any text (and does not run any special commands inside the Ink knot either). You use this to set Ink variables inside a sequence. In the example game, when Hermione reaches the library we execute an Ink knot to set a variable. Then we use that variable when the player meets her again, so that she says something else when she is waiting in front of the library. 
   <br><br>
+
+
+  <h2>Buttons</h2>
+
+  Your game can also define two buttons that do things when you press them. The primary button is SPACE, the secondary button is ENTER. By default they don't do anything.
+
+  <br><br>
+
+  Configure the buttons inside the first game block:
+  
+  <pre>
+      title:     title: Game with Buttons, author: James McButton
+      buttons:   1: press_button1, 2: press_button2
+  </pre>
+
+  Then inside the Ink block:
+
+  <pre>
+    === press_button1
+      $move_player_to_map narnia
+
+    === press_button2
+      ~ counter += 1
+  </pre>
+
+  This would make it so that the primary button teleports the player to another map and the secondary button increases a counter. You can use if conditions inside Ink to create all kind of complex behavior when a button is pressed.
 
 
   </body>
