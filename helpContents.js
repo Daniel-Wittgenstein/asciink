@@ -199,7 +199,9 @@ window.helpContents = `
   game for an example of how $block and $unblock can be used: when the player enters
   the kitchen for the first time, they have to choose between two options. If you don't block,
   choices are optional and the player can just walk away from them.<br><br>
-
+  
+  <span class="mark">$hide_text</span>: temporarily hide the text box. (It will reappear when it is needed.)<br><br>
+  
   <span class="mark">$move_player_to_map mapName</span>: You have to put the name of a map after this command. The command
   moves the player to the map with the specified name.
   If you are asking yourself what a map's name is, look at the second block, where you start
@@ -209,6 +211,10 @@ window.helpContents = `
   </pre>
   <b>my-map1</b> would be the map's name you have to use for "jump" (not: "MAP" which is
   just a keyword).<br><br>
+  
+  Important: you may want to use this in conjunction with $hide_text or not, depending on whether you want to display something or not.
+  
+  <br><br>
 
   <span class="mark">$move_player x y</span>: moves the player to another position.<br><br>
 
@@ -217,9 +223,7 @@ window.helpContents = `
   <span class="mark">$move entity_name x y</span>: moves an entity to another position.<br><br>
 
   <span class="mark">$remove entity_name</span>: remove an entity from the game.<br><br>
-  
-  <span class="mark">$hide_text</span>: temporarily hide the text box. (It will reappear when it is needed.)<br><br>
-  
+
   <span class="mark">$change old_tile new_tile</span>: changes all tiles with a character
     to another character (on all maps)<br><br>  
 
