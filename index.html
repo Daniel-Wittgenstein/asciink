@@ -480,6 +480,9 @@
     }
 
     function playIt() {
+      //remove focus from play button, so that space does not retrigger it:
+      document.querySelectorAll('button').forEach(btn => btn.blur())
+
       errorDiv.innerHTML = ""
       saveProject()
       outputDiv.innerHTML = ""
