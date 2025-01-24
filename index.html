@@ -322,15 +322,20 @@
       document.addEventListener("keyup", (ev) => {
         if (player.gameOver) return
         const k = ev.key
-        let oldX = player.x
-        let oldY = player.y
         if (k === "1" || k === "2" || k === "3" || k === "4" || k === "5" || k === "6" ||
             k === "7" || k === "8" || k === "9") {
           const num = Number(k)
           takeTurn(num - 1)
           return
         }
+      })
+
+      document.addEventListener("keydown", (ev) => {
         if (player.blocked) return
+        if (player.gameOver) return
+        const k = ev.key
+        let oldX = player.x
+        let oldY = player.y
         let walked = false
         if (k === "ArrowUp" || k === "w") {player.y --; walked = true}
         if (k === "ArrowDown" || k === "s") {player.y ++; walked = true}
